@@ -74,6 +74,9 @@ public class MCOPTConfig {
     public static final ModConfigSpec.BooleanValue REMOVE_SQUID_RANDOM_MOVEMENT;
     public static final ModConfigSpec.BooleanValue REMOVE_SQUID_FLEE;
 
+    // Weather Optimizations
+    public static final ModConfigSpec.BooleanValue ENABLE_BETTER_SNOW_LOGIC;
+
     static {
         BUILDER.comment("MCOPT Client-Side Performance Configuration")
                .push("general");
@@ -202,6 +205,16 @@ public class MCOPTConfig {
         LEAK_MEMORY_ALERT_COOLDOWN_SECONDS = BUILDER
                 .comment("Minimum seconds between consecutive high-memory warnings")
                 .defineInRange("leakMemoryAlertCooldownSeconds", 15, 1, 600);
+
+        BUILDER.pop();
+
+        BUILDER.comment("Weather & Snow Optimizations")
+               .push("weather");
+
+        ENABLE_BETTER_SNOW_LOGIC = BUILDER
+                .comment("Better snow accumulation logic to avoid redundant neighbor updates",
+                        "Inspired by Simple Snowy Fix; keeps visuals identical while reducing rebuild spam")
+                .define("enableBetterSnowLogic", true);
 
         BUILDER.pop();
 
