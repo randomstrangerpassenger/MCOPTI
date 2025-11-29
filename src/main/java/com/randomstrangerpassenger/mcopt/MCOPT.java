@@ -39,6 +39,10 @@ public class MCOPT {
                 LOGGER.info("AI optimization system: ENABLED");
             });
         }
+
+        if (MCOPTConfig.ENABLE_MAX_HEALTH_STABILITY.get()) {
+            LOGGER.info("Max health stability fix: ENABLED");
+        }
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {

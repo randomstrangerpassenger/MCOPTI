@@ -49,6 +49,11 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **메모리 사용량 경고**: 설정된 임계치 이상 사용 시 경고 로그 출력
 - **MCOPT 캐시 초기화**: 월드 언로드 시 자체 캐시를 즉시 비워 누수 위험 최소화
 
+#### Max Health 안정화 ⭐ NEW
+- **비율 기반 체력 유지**: MAX_HEALTH 속성이 변해도 현재 체력 비율을 유지
+- **로그인/차원 이동 보호**: 추가 하트가 있는 플레이어가 10하트로 초기화되는 문제 방지
+- **버프 만료 완충**: 임시 버프가 끝나도 갑작스런 대미지 없이 체력을 부드럽게 조정
+
 #### Entity AI Optimization ⭐ NEW
 - **Math Function Caching**: Pre-computed atan2, sin, cos lookup tables for AI calculations
 - **Optimized LookControl**: Replaces mob LookControl with cached math version
@@ -150,6 +155,13 @@ leakGcNudge = false
 leakWarningIntervalTicks = 200
 # 메모리 경고 간 최소 쿨다운(초)
 leakMemoryAlertCooldownSeconds = 15
+```
+
+#### Max Health 안정화
+```toml
+[general.health]
+# MAX_HEALTH가 변할 때 현재 체력 비율을 그대로 유지
+enableMaxHealthStability = true
 ```
 
 #### Experience Orb Merging
