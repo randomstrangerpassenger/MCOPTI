@@ -11,6 +11,12 @@ public class MCOPTConfig {
     public static final ModConfigSpec.IntValue CHUNK_UPDATE_LIMIT;
     public static final ModConfigSpec.BooleanValue AGGRESSIVE_CHUNK_CULLING;
 
+    // Dynamic FPS Settings
+    public static final ModConfigSpec.BooleanValue ENABLE_DYNAMIC_FPS;
+    public static final ModConfigSpec.IntValue MENU_FRAME_RATE_LIMIT;
+    public static final ModConfigSpec.IntValue UNFOCUSED_FRAME_RATE_LIMIT;
+    public static final ModConfigSpec.IntValue MINIMIZED_FRAME_RATE_LIMIT;
+
     // Render Distance Optimization Settings
     public static final ModConfigSpec.BooleanValue ENABLE_ELLIPTICAL_RENDER_DISTANCE;
     public static final ModConfigSpec.DoubleValue VERTICAL_RENDER_STRETCH;
@@ -84,6 +90,27 @@ public class MCOPTConfig {
     static {
         BUILDER.comment("MCOPT Client-Side Performance Configuration")
                .push("general");
+
+        BUILDER.comment("Dynamic FPS controller")
+               .push("dynamic_fps");
+
+        ENABLE_DYNAMIC_FPS = BUILDER
+                .comment("Enable adaptive FPS limits when the game is in the background or showing menus")
+                .define("enableDynamicFps", true);
+
+        MENU_FRAME_RATE_LIMIT = BUILDER
+                .comment("FPS limit while any menu or pause screen is open")
+                .defineInRange("menuFrameRateLimit", 30, 0, 240);
+
+        UNFOCUSED_FRAME_RATE_LIMIT = BUILDER
+                .comment("FPS limit while the Minecraft window is unfocused")
+                .defineInRange("unfocusedFrameRateLimit", 15, 0, 240);
+
+        MINIMIZED_FRAME_RATE_LIMIT = BUILDER
+                .comment("FPS limit while the Minecraft window is minimized")
+                .defineInRange("minimizedFrameRateLimit", 1, 0, 60);
+
+        BUILDER.pop();
 
         BUILDER.comment("Chunk Rendering Optimizations")
                .push("chunk_rendering");

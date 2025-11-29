@@ -25,6 +25,11 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **Behind-Wall Culling**: Optionally culls entities that are completely behind walls
 - **Smart Importance Detection**: Never culls important entities like vehicles or passengers
 
+#### Dynamic FPS 컨트롤러 ⭐ NEW
+- **창 상태 기반 FPS 캡**: 플레이 화면, 메뉴, 비활성화, 최소화 상태마다 서로 다른 FPS 제한 적용
+- **원본 값 보존**: 사용자가 지정한 최대 FPS를 기억했다가 포커스를 되찾으면 즉시 복원
+- **완전 독립 구현**: 렌더 스레드의 프레임 한도만 건드려 다른 모드/루프와 충돌 최소화
+
 #### Particle System Optimization
 - **Per-Frame Particle Limiting**: Prevents FPS drops from particle explosions
 - **Probabilistic Spawn Reduction**: Maintains visual quality while reducing particle count
@@ -90,6 +95,22 @@ All optimizations can be toggled and fine-tuned through the mod's configuration 
 After the first launch, a configuration file will be created at `.minecraft/config/mcopt-client.toml`. You can edit this file to customize the optimization settings.
 
 ### Configuration Options
+
+#### Dynamic FPS
+```toml
+[general.dynamic_fps]
+# 게임 화면이 아닌 상황에서 FPS를 자동으로 낮춰 CPU/GPU 사용량을 줄입니다
+enableDynamicFps = true
+
+# 메뉴나 일시정지 화면에서의 FPS 제한 (0은 무제한)
+menuFrameRateLimit = 30
+
+# 창 포커스를 잃었을 때의 FPS 제한 (0은 무제한)
+unfocusedFrameRateLimit = 15
+
+# 창이 최소화되었을 때의 FPS 제한 (0은 무제한)
+minimizedFrameRateLimit = 1
+```
 
 #### Chunk Rendering
 ```toml
