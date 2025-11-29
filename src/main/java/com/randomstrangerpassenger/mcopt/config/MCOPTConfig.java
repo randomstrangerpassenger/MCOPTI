@@ -40,6 +40,9 @@ public class MCOPTConfig {
     public static final ModConfigSpec.IntValue LEAK_WARNING_INTERVAL_TICKS;
     public static final ModConfigSpec.IntValue LEAK_MEMORY_ALERT_COOLDOWN_SECONDS;
 
+    // Health Stability
+    public static final ModConfigSpec.BooleanValue ENABLE_MAX_HEALTH_STABILITY;
+
     // Experience Orb Merging Settings
     public static final ModConfigSpec.BooleanValue ENABLE_XP_ORB_MERGING;
     public static final ModConfigSpec.DoubleValue XP_ORB_MERGE_RADIUS;
@@ -199,6 +202,16 @@ public class MCOPTConfig {
         LEAK_MEMORY_ALERT_COOLDOWN_SECONDS = BUILDER
                 .comment("Minimum seconds between consecutive high-memory warnings")
                 .defineInRange("leakMemoryAlertCooldownSeconds", 15, 1, 600);
+
+        BUILDER.pop();
+
+        BUILDER.comment("Health stability when max health changes")
+               .push("health");
+
+        ENABLE_MAX_HEALTH_STABILITY = BUILDER
+                .comment("Preserve player health percentage when MAX_HEALTH changes",
+                        "Prevents losing extra hearts after relogging or when temporary buffs expire")
+                .define("enableMaxHealthStability", true);
 
         BUILDER.pop();
 
