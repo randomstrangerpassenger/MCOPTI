@@ -46,5 +46,9 @@ public class MCOPT {
         if (MCOPTConfig.ENABLE_PARTICLE_OPTIMIZATIONS.get()) {
             LOGGER.info("Particle system optimizations: ENABLED");
         }
+
+        if (MCOPTConfig.ENABLE_XP_ORB_MERGING.get()) {
+            LOGGER.info("Experience orb merging optimizations: ENABLED");
+        }
     }
 }

@@ -4,6 +4,9 @@
   "package": "com.randomstrangerpassenger.mcopt.mixin",
   "compatibilityLevel": "JAVA_21",
   "refmap": "mcopt.refmap.json",
+  "mixins": [
+    "ExperienceOrbMixin"
+  ],
   "client": [
     "ChunkRenderDispatcherMixin",
     "EntityRenderDispatcherMixin",
