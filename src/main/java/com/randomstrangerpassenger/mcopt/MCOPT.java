@@ -60,6 +60,10 @@ public class MCOPT {
             LOGGER.info("Experience orb merging optimizations: ENABLED");
         }
 
+        if (MCOPTConfig.ENABLE_LEAK_GUARD.get()) {
+            LOGGER.info("Leak guard (AllTheLeaks-style world leak detection): ENABLED");
+        }
+
         if (MCOPTConfig.ENABLE_AI_OPTIMIZATIONS.get()) {
             LOGGER.info("AI optimization: ENABLED");
             if (MCOPTConfig.ENABLE_MATH_CACHE.get()) {

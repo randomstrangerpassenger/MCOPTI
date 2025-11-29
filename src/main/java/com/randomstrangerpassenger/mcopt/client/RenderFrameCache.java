@@ -88,4 +88,17 @@ public class RenderFrameCache {
     public static double getRenderDistance() {
         return renderDistance;
     }
+
+    /**
+     * Clear cached values when the client unloads a level to avoid stale world references.
+     */
+    public static void reset() {
+        cameraPosition = Vec3.ZERO;
+        renderDistance = 0.0;
+        verticalStretch = 1.0;
+        horizontalStretch = 1.0;
+        renderDistanceSquared = 0.0;
+        lastUpdateFrame = -1;
+        currentFrame = 0;
+    }
 }
