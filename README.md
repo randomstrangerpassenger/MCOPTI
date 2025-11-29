@@ -43,6 +43,12 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **Panic Button (F8)**: Emergency memory cleanup with instant feedback
 - **FerriteCore Compatible**: Designed to complement static memory optimizations
 
+#### Leak Guard (AllTheLeaks 스타일) ⭐ NEW
+- **월드 전환 메모리 누수 감시**: 언로드된 월드 참조가 남아있는지 실시간 감시
+- **경량 GC 보조 옵션**: 필요 시 단 한 번의 `System.gc()`로 정체된 참조 해제 시도
+- **메모리 사용량 경고**: 설정된 임계치 이상 사용 시 경고 로그 출력
+- **MCOPT 캐시 초기화**: 월드 언로드 시 자체 캐시를 즉시 비워 누수 위험 최소화
+
 #### Entity AI Optimization ⭐ NEW
 - **Math Function Caching**: Pre-computed atan2, sin, cos lookup tables for AI calculations
 - **Optimized LookControl**: Replaces mob LookControl with cached math version
@@ -132,6 +138,18 @@ enableObjectPooling = true
 enableResourceCleanup = true
 # Show memory usage HUD in top-left corner
 showMemoryHud = true
+# Enable AllTheLeaks 스타일 누수 감시
+enableLeakGuard = true
+# 월드 언로드 후 경고를 띄우기까지 대기할 틱 수 (기본: 200틱 = 10초)
+leakCheckDelayTicks = 200
+# 경고를 발생시킬 메모리 사용량(MB)
+leakMemoryAlertMb = 4096
+# 누수가 의심될 때 단 한 번 GC를 시도
+leakGcNudge = false
+# 추가 경고를 출력하기 전 대기할 틱 수 (로그 스팸 방지)
+leakWarningIntervalTicks = 200
+# 메모리 경고 간 최소 쿨다운(초)
+leakMemoryAlertCooldownSeconds = 15
 ```
 
 #### Experience Orb Merging

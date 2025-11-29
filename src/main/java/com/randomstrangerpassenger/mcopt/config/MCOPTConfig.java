@@ -33,6 +33,12 @@ public class MCOPTConfig {
     public static final ModConfigSpec.BooleanValue ENABLE_OBJECT_POOLING;
     public static final ModConfigSpec.BooleanValue ENABLE_RESOURCE_CLEANUP;
     public static final ModConfigSpec.BooleanValue SHOW_MEMORY_HUD;
+    public static final ModConfigSpec.BooleanValue ENABLE_LEAK_GUARD;
+    public static final ModConfigSpec.IntValue LEAK_CHECK_DELAY_TICKS;
+    public static final ModConfigSpec.IntValue LEAK_MEMORY_ALERT_MB;
+    public static final ModConfigSpec.BooleanValue LEAK_GC_NUDGE;
+    public static final ModConfigSpec.IntValue LEAK_WARNING_INTERVAL_TICKS;
+    public static final ModConfigSpec.IntValue LEAK_MEMORY_ALERT_COOLDOWN_SECONDS;
 
     // Experience Orb Merging Settings
     public static final ModConfigSpec.BooleanValue ENABLE_XP_ORB_MERGING;
@@ -169,6 +175,30 @@ public class MCOPTConfig {
         SHOW_MEMORY_HUD = BUILDER
                 .comment("Show memory usage HUD in top-left corner")
                 .define("showMemoryHud", true);
+
+        ENABLE_LEAK_GUARD = BUILDER
+                .comment("Enable leak guard (AllTheLeaks-inspired) to watch for stuck client worlds")
+                .define("enableLeakGuard", true);
+
+        LEAK_CHECK_DELAY_TICKS = BUILDER
+                .comment("Ticks to wait after unloading a level before reporting potential leaks")
+                .defineInRange("leakCheckDelayTicks", 200, 20, 2400);
+
+        LEAK_MEMORY_ALERT_MB = BUILDER
+                .comment("Memory usage threshold (MB) that triggers leak guard warnings")
+                .defineInRange("leakMemoryAlertMb", 4096, 512, 16384);
+
+        LEAK_GC_NUDGE = BUILDER
+                .comment("Attempt a single System.gc() if an old level is still referenced after the delay")
+                .define("leakGcNudge", false);
+
+        LEAK_WARNING_INTERVAL_TICKS = BUILDER
+                .comment("Interval between leak guard warnings after the first alert (to avoid log spam)")
+                .defineInRange("leakWarningIntervalTicks", 200, 40, 4800);
+
+        LEAK_MEMORY_ALERT_COOLDOWN_SECONDS = BUILDER
+                .comment("Minimum seconds between consecutive high-memory warnings")
+                .defineInRange("leakMemoryAlertCooldownSeconds", 15, 1, 600);
 
         BUILDER.pop();
 
