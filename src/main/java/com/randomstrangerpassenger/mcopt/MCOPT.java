@@ -3,6 +3,7 @@ package com.randomstrangerpassenger.mcopt;
 import com.randomstrangerpassenger.mcopt.ai.AIOptimizationSystem;
 import com.randomstrangerpassenger.mcopt.config.MCOPTConfig;
 import com.randomstrangerpassenger.mcopt.golem.GolemSpawnFixHandler;
+import com.randomstrangerpassenger.mcopt.client.dynamicfps.DynamicFpsManager;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -81,6 +82,11 @@ public class MCOPT {
             if (MCOPTConfig.ENABLE_OPTIMIZED_LOOK_CONTROL.get()) {
                 LOGGER.info("  - Optimized LookControl: ENABLED");
             }
+        }
+
+        if (MCOPTConfig.ENABLE_DYNAMIC_FPS.get()) {
+            LOGGER.info("Dynamic FPS controller: ENABLED");
+            MinecraftForge.EVENT_BUS.register(new DynamicFpsManager());
         }
     }
 }
