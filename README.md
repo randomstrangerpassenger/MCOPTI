@@ -42,6 +42,12 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **Vanilla 호환**: 눈 쌓이는 방식은 그대로 유지하면서 업데이트 플래그만 최소화
 - **바닐라 토글 제공**: `enableBetterSnowLogic`을 끄면 원본 눈 적층 방식 그대로 사용
 
+#### 꿀벌 둥지 복귀 안정화 (NeoBeeFix 영감) ⭐ NEW
+- **둥지-꽃 동기화 강화**: 오랫동안 둥지로 돌아가지 못하는 꿀벌의 목표 좌표를 자동 초기화
+- **경로 재탐색 지연 페널티**: 막힌 둥지를 반복 탐색해 틱 시간을 잡아먹는 현상을 완화
+- **완전 독립 구현**: 네비게이션 진행 상황만 추적하므로 다른 벌 관련 모드와 충돌을 최소화
+- **Config 토글 제공**: `bee_fix.enableBeeStuckFix`로 필요 시 간단히 끌 수 있음
+
 #### Experience Orb Merging Optimization ⭐ NEW
 - **Automatic Orb Merging**: Combines nearby experience orbs into single entities
 - **Configurable Merge Radius**: Adjust how aggressively orbs merge
@@ -196,6 +202,22 @@ particleSpawnReduction = 0.25
 enableSnowAccumulationFix = true
 # 바닐라 눈 적층 방식을 유지하고 싶다면 false로 설정
 enableBetterSnowLogic = true
+```
+
+#### Bee Stuck Fix
+```toml
+[general.bee_fix]
+# 꿀벌이 둥지로 돌아가지 못하고 멈춰 있을 때 좌표를 초기화해 다시 탐색하게 합니다
+enableBeeStuckFix = true
+
+# 같은 둥지를 향해 진척 없이 버티는 최대 시간 (틱)
+stuckTimeoutTicks = 200
+
+# 둥지를 잃었을 때 다시 찾기 시작하기 전 최소 대기 시간 (틱)
+relinkCooldownTicks = 40
+
+# 잘못된 둥지를 반복 검색한 경우 적용할 추가 지연 (틱)
+failedHiveSearchPenalty = 1200
 ```
 
 #### Village

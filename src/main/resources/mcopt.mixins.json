@@ -4,21 +4,10 @@
   "package": "com.randomstrangerpassenger.mcopt.mixin",
   "compatibilityLevel": "JAVA_21",
   "refmap": "mcopt.refmap.json",
-    "mixins": [
-      "ExperienceOrbMixin",
-      "EntityPortalMixin",
-      "MobAIMixin",
-      "SnowLayerBlockMixin",
-      "RangedAttributeMixin",
-      "EnchantmentMenuMixin"
-    ],
-  "client": [
-    "ChunkRenderDispatcherMixin",
-    "EntityRenderDispatcherMixin",
-    "ParticleEngineMixin",
-    "LevelRendererMixin",
-    "RenderSectionMixin"
+  "mixins": [
+    "BeeStuckFixMixin"
   ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   }
