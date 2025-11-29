@@ -30,6 +30,12 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **Probabilistic Spawn Reduction**: Maintains visual quality while reducing particle count
 - **Distance-Based Particle Culling**: Skips particles that are too far from the camera
 
+#### Experience Orb Merging Optimization ⭐ NEW
+- **Automatic Orb Merging**: Combines nearby experience orbs into single entities
+- **Configurable Merge Radius**: Adjust how aggressively orbs merge
+- **Performance Boost**: Significantly reduces lag during mob farming or mining
+- **Fully Compatible**: Works seamlessly with vanilla gameplay mechanics
+
 ### ⚙️ Highly Configurable
 
 All optimizations can be toggled and fine-tuned through the mod's configuration file located at `.minecraft/config/mcopt-client.toml`.
@@ -104,21 +110,37 @@ enableMemoryOptimizations = true
 aggressiveGCPrevention = true
 ```
 
+#### Experience Orb Merging
+```toml
+[general.xp_orb_merging]
+# Enable experience orb merging
+enableXpOrbMerging = true
+# Merge radius in blocks (0.5-5.0, default: 1.5)
+# Larger radius = more aggressive merging
+xpOrbMergeRadius = 1.5
+# Merge check delay in ticks (1-40, default: 10)
+# Lower = more frequent merging, higher = less CPU usage
+xpOrbMergeDelay = 10
+```
+
 ## Performance Tips
 
 For best performance in singleplayer:
 1. Enable all optimizations in the config
 2. Enable `enableEllipticalRenderDistance` for 10-35% FPS boost
-3. Set `chunkUpdateLimit` to 4-6 for smooth FPS
-4. Set `verticalRenderStretch` to 0.5-0.75 for better performance
-5. Set `entityCullingDistance` based on your render distance (32-64 for normal, 64-128 for high)
-6. Set `particleSpawnReduction` to 0.25-0.5 depending on your preferences
+3. Enable `enableXpOrbMerging` to reduce lag during mob farming/mining
+4. Set `chunkUpdateLimit` to 4-6 for smooth FPS
+5. Set `verticalRenderStretch` to 0.5-0.75 for better performance
+6. Set `entityCullingDistance` based on your render distance (32-64 for normal, 64-128 for high)
+7. Set `particleSpawnReduction` to 0.25-0.5 depending on your preferences
 
 For high-end systems:
 - Increase `chunkUpdateLimit` to 10-15 for faster world updates
 - Set `verticalRenderStretch` to 1.0-1.5 to see more vertically
 - Set `horizontalRenderStretch` to 1.2-1.5 to extend horizontal view
 - Increase `maxParticlesPerFrame` to 1000-2000 for more particles
+- Set `xpOrbMergeRadius` to 2.0-3.0 for more aggressive merging
+- Set `xpOrbMergeDelay` to 5-10 for more frequent checks
 - Disable `aggressiveChunkCulling` if you notice pop-in
 
 For low-end systems:
@@ -127,6 +149,8 @@ For low-end systems:
 - Set `horizontalRenderStretch` to 0.8-0.9 to reduce chunk load
 - Set `entityCullingDistance` to 32-48
 - Increase `particleSpawnReduction` to 0.5-0.75
+- Set `xpOrbMergeRadius` to 2.5-5.0 for maximum orb reduction
+- Set `xpOrbMergeDelay` to 15-20 to reduce CPU overhead
 - Enable `aggressiveChunkCulling`
 
 ## Compatibility
@@ -191,6 +215,7 @@ The compiled mod will be located in `build/libs/mcopt-1.0.0.jar`
 5. **Probabilistic reduction**: Maintains visual quality while reducing load
 6. **Calculation caching**: Avoids redundant expensive operations
 7. **Configurable stretch factors**: Fine-tune vertical/horizontal render shapes
+8. **Entity merging**: Combines nearby experience orbs to reduce entity count
 
 ## Contributing
 

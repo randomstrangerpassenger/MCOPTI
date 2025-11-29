@@ -31,6 +31,11 @@ public class MCOPTConfig {
     public static final ModConfigSpec.BooleanValue ENABLE_MEMORY_OPTIMIZATIONS;
     public static final ModConfigSpec.BooleanValue AGGRESSIVE_GC_PREVENTION;
 
+    // Experience Orb Merging Settings
+    public static final ModConfigSpec.BooleanValue ENABLE_XP_ORB_MERGING;
+    public static final ModConfigSpec.DoubleValue XP_ORB_MERGE_RADIUS;
+    public static final ModConfigSpec.IntValue XP_ORB_MERGE_DELAY;
+
     static {
         BUILDER.comment("MCOPT Client-Side Performance Configuration")
                .push("general");
@@ -123,6 +128,28 @@ public class MCOPTConfig {
         AGGRESSIVE_GC_PREVENTION = BUILDER
                 .comment("Prevent garbage collection during critical rendering phases")
                 .define("aggressiveGCPrevention", true);
+
+        BUILDER.pop();
+
+        BUILDER.comment("Experience Orb Merging Optimization")
+               .push("xp_orb_merging");
+
+        ENABLE_XP_ORB_MERGING = BUILDER
+                .comment("Enable experience orb merging (Recommended: true)",
+                        "Merges nearby experience orbs into single entities to reduce lag",
+                        "Especially helpful when fighting mobs or breaking ore blocks")
+                .define("enableXpOrbMerging", true);
+
+        XP_ORB_MERGE_RADIUS = BUILDER
+                .comment("Radius within which experience orbs will merge (in blocks)",
+                        "Larger radius = more aggressive merging, better performance")
+                .defineInRange("xpOrbMergeRadius", 1.5, 0.5, 5.0);
+
+        XP_ORB_MERGE_DELAY = BUILDER
+                .comment("How often to check for nearby orbs to merge (in ticks)",
+                        "Lower = more frequent merging, Higher = less CPU usage",
+                        "20 ticks = 1 second")
+                .defineInRange("xpOrbMergeDelay", 10, 1, 40);
 
         BUILDER.pop();
         BUILDER.pop();
