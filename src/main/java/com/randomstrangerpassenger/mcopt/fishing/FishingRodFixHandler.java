@@ -2,6 +2,7 @@ package com.randomstrangerpassenger.mcopt.fishing;
 
 import com.randomstrangerpassenger.mcopt.MCOPT;
 import com.randomstrangerpassenger.mcopt.config.MCOPTConfig;
+import com.randomstrangerpassenger.mcopt.util.MCOPTConstants;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
@@ -40,7 +41,7 @@ public final class FishingRodFixHandler {
 
         FishingHook hook = player.fishing;
         if (hook == null) {
-            return; // 정상 상태
+            return; // Normal state - no hook active
         }
 
         if (shouldForceStop(player, hook)) {
@@ -54,24 +55,24 @@ public final class FishingRodFixHandler {
         }
 
         if (hook.level() != player.level()) {
-            return true; // 차원이 다르면 즉시 정리
+            return true; // Different dimension - clean up immediately
         }
 
         if (hook.getOwner() != player) {
-            return true; // 다른 엔티티가 소유한 상태로 뒤바뀜
+            return true; // Ownership changed to different entity
         }
 
         if (!isHoldingFishingRod(player)) {
-            return true; // 낚싯대를 치웠다면 줄을 걷어야 함
+            return true; // Player no longer holding fishing rod - reel in
         }
 
-        // 낚싯찌가 불러오지 않은 청크에 남아 있으면 조작이 불가능해지므로 안전하게 제거
+        // Hook in unloaded chunk becomes uncontrollable, so remove it safely
         if (!hook.level().hasChunkAt(hook.blockPosition())) {
             return true;
         }
 
-        // 바닐라와 동일한 최대 거리 기준을 한 번 더 확인해 끊어진 줄을 처리
-        return hook.distanceToSqr(player) > 1024.0D;
+        // Check vanilla max distance to handle broken lines
+        return hook.distanceToSqr(player) > MCOPTConstants.Fishing.MAX_FISHING_DISTANCE_SQUARED;
     }
 
     private static boolean isHoldingFishingRod(Player player) {
