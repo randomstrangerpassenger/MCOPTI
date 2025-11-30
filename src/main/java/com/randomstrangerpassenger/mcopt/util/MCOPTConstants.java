@@ -68,5 +68,71 @@ public final class MCOPTConstants {
 
         /** Back-face culling dot product threshold */
         public static final double BACKFACE_CULLING_DOT_THRESHOLD = -0.5;
+
+        /** Milliseconds per second conversion factor */
+        public static final long MILLIS_PER_SECOND = 1000L;
+    }
+
+    /**
+     * Fishing mechanics constants
+     */
+    public static final class Fishing {
+        private Fishing() {}
+
+        /**
+         * Maximum distance squared between player and fishing hook before the line breaks.
+         * This matches vanilla Minecraft's fishing rod range limit (32 blocks squared = 1024).
+         */
+        public static final double MAX_FISHING_DISTANCE_SQUARED = 1024.0D;
+    }
+
+    /**
+     * World and dimension constants
+     */
+    public static final class World {
+        private World() {}
+
+        /**
+         * Minimum Y coordinate in Minecraft worlds (build limit).
+         * Valid range: -64 to 320 (as of Minecraft 1.18+)
+         */
+        public static final int MIN_WORLD_Y = -64;
+
+        /**
+         * Maximum Y coordinate in Minecraft worlds (build limit).
+         * Valid range: -64 to 320 (as of Minecraft 1.18+)
+         */
+        public static final int MAX_WORLD_Y = 320;
+
+        /**
+         * Maximum X/Z coordinate before reaching world border limit.
+         * Minecraft's max world border is ±29,999,984 blocks.
+         */
+        public static final int MAX_WORLD_COORDINATE = 29_999_984;
+
+        /**
+         * Offset to center of a block (0.5 blocks from corner).
+         * Used for teleportation and entity placement.
+         */
+        public static final double BLOCK_CENTER_OFFSET = 0.5;
+
+        /**
+         * Small Y offset for portal teleportation to prevent falling through blocks.
+         * 0.1 blocks above the portal block ensures stable landing.
+         */
+        public static final double PORTAL_Y_OFFSET = 0.1;
+    }
+
+    /**
+     * Input and event handling constants
+     */
+    public static final class Input {
+        private Input() {}
+
+        /**
+         * GLFW key/mouse action code for key release.
+         * Used to detect when a key or mouse button is released.
+         */
+        public static final int INPUT_ACTION_RELEASE = 0;
     }
 }

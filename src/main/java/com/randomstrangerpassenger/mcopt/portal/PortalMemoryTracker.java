@@ -1,6 +1,7 @@
 package com.randomstrangerpassenger.mcopt.portal;
 
 import com.randomstrangerpassenger.mcopt.MCOPT;
+import com.randomstrangerpassenger.mcopt.util.MCOPTConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -83,9 +84,9 @@ public final class PortalMemoryTracker {
             return;
         }
 
-        double x = portalPos.getX() + 0.5;
-        double y = portalPos.getY() + 0.1;
-        double z = portalPos.getZ() + 0.5;
+        double x = portalPos.getX() + MCOPTConstants.World.BLOCK_CENTER_OFFSET;
+        double y = portalPos.getY() + MCOPTConstants.World.PORTAL_Y_OFFSET;
+        double z = portalPos.getZ() + MCOPTConstants.World.BLOCK_CENTER_OFFSET;
 
         // Wrap teleport in try-catch to handle potential errors gracefully
         try {
@@ -165,15 +166,14 @@ public final class PortalMemoryTracker {
             return false;
         }
 
-        // Check Y coordinate is within build limits (-64 to 320)
-        if (pos.getY() < -64 || pos.getY() > 320) {
+        // Check Y coordinate is within build limits
+        if (pos.getY() < MCOPTConstants.World.MIN_WORLD_Y || pos.getY() > MCOPTConstants.World.MAX_WORLD_Y) {
             return false;
         }
 
         // Check X and Z coordinates are within world border limits
-        // Minecraft's max world border is ±29,999,984 blocks
-        int maxCoordinate = 29_999_984;
-        if (Math.abs(pos.getX()) > maxCoordinate || Math.abs(pos.getZ()) > maxCoordinate) {
+        if (Math.abs(pos.getX()) > MCOPTConstants.World.MAX_WORLD_COORDINATE ||
+            Math.abs(pos.getZ()) > MCOPTConstants.World.MAX_WORLD_COORDINATE) {
             return false;
         }
 

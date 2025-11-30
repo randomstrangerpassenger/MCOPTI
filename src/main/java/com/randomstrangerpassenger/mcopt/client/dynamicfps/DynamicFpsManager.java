@@ -3,6 +3,7 @@ package com.randomstrangerpassenger.mcopt.client.dynamicfps;
 import com.randomstrangerpassenger.mcopt.MCOPT;
 import com.randomstrangerpassenger.mcopt.config.MCOPTConfig;
 import com.randomstrangerpassenger.mcopt.util.FeatureToggles;
+import com.randomstrangerpassenger.mcopt.util.MCOPTConstants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -45,14 +46,14 @@ public final class DynamicFpsManager {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onKeyInput(InputEvent.Key event) {
-        if (event.getAction() != 0) {
+        if (event.getAction() != MCOPTConstants.Input.INPUT_ACTION_RELEASE) {
             markInteraction();
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onMouseButton(InputEvent.MouseButton.Pre event) {
-        if (event.getAction() != 0) {
+        if (event.getAction() != MCOPTConstants.Input.INPUT_ACTION_RELEASE) {
             markInteraction();
         }
     }
@@ -198,7 +199,7 @@ public final class DynamicFpsManager {
         }
 
         long idleDurationMillis = Util.getMillis() - lastInteractionMillis;
-        long idleThresholdMillis = MCOPTConfig.IDLE_BOOST_INACTIVITY_SECONDS.get() * 1000L;
+        long idleThresholdMillis = MCOPTConfig.IDLE_BOOST_INACTIVITY_SECONDS.get() * MCOPTConstants.Performance.MILLIS_PER_SECOND;
         return idleDurationMillis >= idleThresholdMillis;
     }
 

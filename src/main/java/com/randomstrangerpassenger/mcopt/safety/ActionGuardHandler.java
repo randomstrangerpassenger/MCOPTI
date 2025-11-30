@@ -48,7 +48,7 @@ public class ActionGuardHandler {
         }
 
         if (target instanceof Player) {
-            return; // PvP는 건드리지 않음
+            return; // Don't interfere with PvP
         }
 
         ServerLevel level = serverPlayer.serverLevel();
