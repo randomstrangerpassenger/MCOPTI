@@ -1,6 +1,6 @@
 package com.randomstrangerpassenger.mcopt.mixin.server;
 
-import com.randomstrangerpassenger.mcopt.server.ai.AIOptimizationSystem;
+import com.randomstrangerpassenger.mcopt.server.ai.AIOptimizationSystemV2;
 import net.minecraft.world.entity.Mob;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,8 +37,8 @@ public class MobAIMixin {
         Mob mob = (Mob) (Object) this;
 
         // Apply AI optimizations if system is initialized
-        if (AIOptimizationSystem.isInitialized()) {
-            AIOptimizationSystem.processMobGoals(mob);
+        if (AIOptimizationSystemV2.isInitialized()) {
+            AIOptimizationSystemV2.processMobGoals(mob);
         }
     }
 }

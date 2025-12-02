@@ -1,7 +1,7 @@
 package com.randomstrangerpassenger.mcopt;
 
 import com.randomstrangerpassenger.mcopt.config.MCOPTConfig;
-import com.randomstrangerpassenger.mcopt.server.ai.AIOptimizationSystem;
+import com.randomstrangerpassenger.mcopt.server.ai.AIOptimizationSystemV2;
 import com.randomstrangerpassenger.mcopt.server.entity.clearlag.ClearLagManager;
 import com.randomstrangerpassenger.mcopt.server.entity.golem.GolemSpawnFixHandler;
 import com.randomstrangerpassenger.mcopt.client.fps.DynamicFpsManager;
@@ -59,8 +59,8 @@ public class MCOPT {
         // Initialize AI optimization system
         if (FeatureToggles.isAiOptimizationsEnabled()) {
             event.enqueueWork(() -> {
-                AIOptimizationSystem.init();
-                LOGGER.info("AI optimization system: ENABLED");
+                AIOptimizationSystemV2.init();
+                LOGGER.info("AI optimization system: ENABLED (Strategy-based V2)");
             });
         }
 

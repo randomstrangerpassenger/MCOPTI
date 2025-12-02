@@ -35,7 +35,13 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * Inspired by AI-Improvements mod, but with independent implementation using Mixin
  * instead of Access Transformers.
+ *
+ * @deprecated This V1 implementation has been superseded by {@link AIOptimizationSystemV2},
+ *             which uses the Strategy pattern for better extensibility and maintainability.
+ *             This class is kept for backward compatibility and will be removed in a future version.
+ *             Please migrate to {@link AIOptimizationSystemV2}.
  */
+@Deprecated(since = "1.0", forRemoval = true)
 public class AIOptimizationSystem {
 
     // Thread-safe initialization flag (volatile ensures visibility across threads)

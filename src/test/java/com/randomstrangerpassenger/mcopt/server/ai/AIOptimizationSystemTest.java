@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.assertj.core.api.Assertions.*;
 
 /**
- * Unit tests for AIOptimizationSystem.
+ * Unit tests for AIOptimizationSystemV2V2 (Strategy-based implementation).
  * <p>
  * Note: Full integration testing requires a complete NeoForge/Minecraft
  * environment with entity instances, goal selectors, and configuration system.
@@ -24,9 +24,10 @@ import static org.assertj.core.api.Assertions.*;
  * - Public API contract
  * - State management
  * - Thread safety
+ * - Strategy registry integration
  */
-@DisplayName("AIOptimizationSystem Unit Tests")
-class AIOptimizationSystemTest {
+@DisplayName("AIOptimizationSystemV2V2 Unit Tests")
+class AIOptimizationSystemV2Test {
 
     // ========== Initialization Tests ==========
 
@@ -34,9 +35,9 @@ class AIOptimizationSystemTest {
     @DisplayName("Should initialize successfully")
     void testInitialization() {
         assertThatCode(() -> {
-            AIOptimizationSystem.init();
+            AIOptimizationSystemV2.init();
         })
-                .as("AIOptimizationSystem.init() should not throw exceptions")
+                .as("AIOptimizationSystemV2.init() should not throw exceptions")
                 .doesNotThrowAnyException();
     }
 
@@ -44,15 +45,15 @@ class AIOptimizationSystemTest {
     @DisplayName("Should be idempotent (multiple init calls are safe)")
     void testIdempotentInitialization() {
         assertThatCode(() -> {
-            AIOptimizationSystem.init();
-            AIOptimizationSystem.init();
-            AIOptimizationSystem.init();
+            AIOptimizationSystemV2.init();
+            AIOptimizationSystemV2.init();
+            AIOptimizationSystemV2.init();
         })
                 .as("Multiple init() calls should be safe and idempotent")
                 .doesNotThrowAnyException();
 
         // After multiple inits, system should still report as initialized
-        assertThat(AIOptimizationSystem.isInitialized())
+        assertThat(AIOptimizationSystemV2.isInitialized())
                 .as("System should be initialized after init() calls")
                 .isTrue();
     }
@@ -69,7 +70,7 @@ class AIOptimizationSystemTest {
         for (int i = 0; i < threadCount; i++) {
             executor.submit(() -> {
                 try {
-                    AIOptimizationSystem.init();
+                    AIOptimizationSystemV2.init();
                     successCount.incrementAndGet();
                 } finally {
                     latch.countDown();
@@ -84,7 +85,7 @@ class AIOptimizationSystemTest {
                 .as("All threads should complete initialization without errors")
                 .isEqualTo(threadCount);
 
-        assertThat(AIOptimizationSystem.isInitialized())
+        assertThat(AIOptimizationSystemV2.isInitialized())
                 .as("System should be initialized after concurrent init attempts")
                 .isTrue();
     }
@@ -93,10 +94,10 @@ class AIOptimizationSystemTest {
     @DisplayName("Should report correct initialization state")
     void testInitializationState() {
         // Initialize the system
-        AIOptimizationSystem.init();
+        AIOptimizationSystemV2.init();
 
         // Verify state is correct
-        assertThat(AIOptimizationSystem.isInitialized())
+        assertThat(AIOptimizationSystemV2.isInitialized())
                 .as("isInitialized() should return true after init()")
                 .isTrue();
     }
@@ -108,24 +109,24 @@ class AIOptimizationSystemTest {
     void testPublicApiExists() {
         assertThatCode(() -> {
             // Verify init() method exists
-            Method initMethod = AIOptimizationSystem.class.getMethod("init");
+            Method initMethod = AIOptimizationSystemV2.class.getMethod("init");
             assertThat(initMethod).isNotNull();
             assertThat(initMethod.getReturnType()).isEqualTo(void.class);
 
             // Verify isInitialized() method exists
-            Method isInitializedMethod = AIOptimizationSystem.class.getMethod("isInitialized");
+            Method isInitializedMethod = AIOptimizationSystemV2.class.getMethod("isInitialized");
             assertThat(isInitializedMethod).isNotNull();
             assertThat(isInitializedMethod.getReturnType()).isEqualTo(boolean.class);
 
             // Verify processMobGoals() method exists
-            Method processMobGoalsMethod = AIOptimizationSystem.class.getMethod(
+            Method processMobGoalsMethod = AIOptimizationSystemV2.class.getMethod(
                     "processMobGoals",
                     net.minecraft.world.entity.Mob.class
             );
             assertThat(processMobGoalsMethod).isNotNull();
             assertThat(processMobGoalsMethod.getReturnType()).isEqualTo(void.class);
         })
-                .as("AIOptimizationSystem should have expected public methods")
+                .as("AIOptimizationSystemV2 should have expected public methods")
                 .doesNotThrowAnyException();
     }
 
@@ -133,9 +134,9 @@ class AIOptimizationSystemTest {
     @DisplayName("Should have all required public static methods")
     void testStaticMethodsExist() throws NoSuchMethodException {
         // Verify all expected public static methods exist
-        Method init = AIOptimizationSystem.class.getMethod("init");
-        Method isInitialized = AIOptimizationSystem.class.getMethod("isInitialized");
-        Method processMobGoals = AIOptimizationSystem.class.getMethod(
+        Method init = AIOptimizationSystemV2.class.getMethod("init");
+        Method isInitialized = AIOptimizationSystemV2.class.getMethod("isInitialized");
+        Method processMobGoals = AIOptimizationSystemV2.class.getMethod(
                 "processMobGoals",
                 net.minecraft.world.entity.Mob.class
         );
@@ -160,12 +161,12 @@ class AIOptimizationSystemTest {
     @DisplayName("Should maintain consistent state across multiple checks")
     void testStateConsistency() {
         // Initialize if not already done
-        AIOptimizationSystem.init();
+        AIOptimizationSystemV2.init();
 
         // Check state multiple times
-        boolean state1 = AIOptimizationSystem.isInitialized();
-        boolean state2 = AIOptimizationSystem.isInitialized();
-        boolean state3 = AIOptimizationSystem.isInitialized();
+        boolean state1 = AIOptimizationSystemV2.isInitialized();
+        boolean state2 = AIOptimizationSystemV2.isInitialized();
+        boolean state3 = AIOptimizationSystemV2.isInitialized();
 
         assertThat(state1)
                 .as("Multiple isInitialized() calls should return consistent results")
@@ -180,7 +181,7 @@ class AIOptimizationSystemTest {
     @DisplayName("Should safely handle concurrent isInitialized() calls")
     void testConcurrentStateChecks() throws InterruptedException {
         // Ensure initialized first
-        AIOptimizationSystem.init();
+        AIOptimizationSystemV2.init();
 
         int threadCount = 20;
         int iterationsPerThread = 1000;
@@ -192,7 +193,7 @@ class AIOptimizationSystemTest {
             executor.submit(() -> {
                 try {
                     for (int j = 0; j < iterationsPerThread; j++) {
-                        boolean initialized = AIOptimizationSystem.isInitialized();
+                        boolean initialized = AIOptimizationSystemV2.isInitialized();
                         // Should always be true after init
                         if (!initialized) {
                             errorCount.incrementAndGet();
@@ -220,13 +221,13 @@ class AIOptimizationSystemTest {
     @DisplayName("Should handle processMobGoals with null safely")
     void testProcessMobGoalsWithNull() {
         // Initialize first
-        AIOptimizationSystem.init();
+        AIOptimizationSystemV2.init();
 
         // processMobGoals with null should either:
         // 1. Handle gracefully (no-op)
         // 2. Throw IllegalArgumentException (acceptable)
         assertThatCode(() -> {
-            AIOptimizationSystem.processMobGoals(null);
+            AIOptimizationSystemV2.processMobGoals(null);
         })
                 .as("processMobGoals(null) should either handle gracefully or throw IllegalArgumentException")
                 .satisfiesAnyOf(
@@ -244,25 +245,25 @@ class AIOptimizationSystemTest {
         // Initialize MathCache first
         MathCache.init();
 
-        // Then initialize AIOptimizationSystem
+        // Then initialize AIOptimizationSystemV2
         assertThatCode(() -> {
-            AIOptimizationSystem.init();
+            AIOptimizationSystemV2.init();
         })
-                .as("AIOptimizationSystem should initialize correctly after MathCache")
+                .as("AIOptimizationSystemV2 should initialize correctly after MathCache")
                 .doesNotThrowAnyException();
 
-        assertThat(AIOptimizationSystem.isInitialized()).isTrue();
+        assertThat(AIOptimizationSystemV2.isInitialized()).isTrue();
     }
 
     @Test
     @DisplayName("Should handle initialization order dependencies gracefully")
     void testInitializationOrderIndependence() {
-        // AIOptimizationSystem should handle being initialized
+        // AIOptimizationSystemV2 should handle being initialized
         // before or after its dependencies
         assertThatCode(() -> {
-            AIOptimizationSystem.init();
+            AIOptimizationSystemV2.init();
         })
-                .as("AIOptimizationSystem should handle initialization order gracefully")
+                .as("AIOptimizationSystemV2 should handle initialization order gracefully")
                 .doesNotThrowAnyException();
     }
 
@@ -271,13 +272,13 @@ class AIOptimizationSystemTest {
     @Test
     @DisplayName("Should be a proper utility class (no instances)")
     void testUtilityClassPattern() {
-        // AIOptimizationSystem should not be instantiable
+        // AIOptimizationSystemV2 should not be instantiable
         assertThatThrownBy(() -> {
-            var constructor = AIOptimizationSystem.class.getDeclaredConstructor();
+            var constructor = AIOptimizationSystemV2.class.getDeclaredConstructor();
             constructor.setAccessible(true);
             constructor.newInstance();
         })
-                .as("AIOptimizationSystem should not be instantiable (utility class)")
+                .as("AIOptimizationSystemV2 should not be instantiable (utility class)")
                 .isInstanceOfAny(
                         IllegalAccessException.class,
                         InstantiationException.class,
@@ -289,14 +290,14 @@ class AIOptimizationSystemTest {
     @Test
     @DisplayName("Should have proper class documentation")
     void testClassDocumentation() {
-        String className = AIOptimizationSystem.class.getSimpleName();
+        String className = AIOptimizationSystemV2.class.getSimpleName();
         assertThat(className)
                 .as("Class should be properly named")
-                .isEqualTo("AIOptimizationSystem");
+                .isEqualTo("AIOptimizationSystemV2");
 
         // Verify class is public
-        assertThat(java.lang.reflect.Modifier.isPublic(AIOptimizationSystem.class.getModifiers()))
-                .as("AIOptimizationSystem should be a public class")
+        assertThat(java.lang.reflect.Modifier.isPublic(AIOptimizationSystemV2.class.getModifiers()))
+                .as("AIOptimizationSystemV2 should be a public class")
                 .isTrue();
     }
 
@@ -305,7 +306,7 @@ class AIOptimizationSystemTest {
     /**
      * Note for future integration testing:
      *
-     * To properly test AIOptimizationSystem's full functionality, you would need:
+     * To properly test AIOptimizationSystemV2's full functionality, you would need:
      *
      * 1. Mock Mob entities with:
      *    - goalSelector and targetSelector
@@ -343,7 +344,7 @@ class AIOptimizationSystemTest {
      *     MCOPTConfig.REMOVE_LOOK_AT_PLAYER.set(true);
      *
      *     // Process mob goals
-     *     AIOptimizationSystem.processMobGoals(testMob);
+     *     AIOptimizationSystemV2.processMobGoals(testMob);
      *
      *     // Verify LookAtPlayerGoal was removed
      *     assertThat(testMob.goalSelector.getAvailableGoals())
@@ -368,7 +369,7 @@ class AIOptimizationSystemTest {
     void testInitializationPerformance() {
         long startTime = System.nanoTime();
 
-        AIOptimizationSystem.init();
+        AIOptimizationSystemV2.init();
 
         long endTime = System.nanoTime();
         long durationMs = (endTime - startTime) / 1_000_000;
@@ -381,13 +382,13 @@ class AIOptimizationSystemTest {
     @Test
     @DisplayName("Should be efficient for repeated isInitialized() calls")
     void testIsInitializedPerformance() {
-        AIOptimizationSystem.init();
+        AIOptimizationSystemV2.init();
 
         long startTime = System.nanoTime();
 
         // Call isInitialized many times
         for (int i = 0; i < 1_000_000; i++) {
-            AIOptimizationSystem.isInitialized();
+            AIOptimizationSystemV2.isInitialized();
         }
 
         long endTime = System.nanoTime();
