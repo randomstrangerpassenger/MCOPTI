@@ -126,6 +126,13 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **권장 설정**: 무거운 모드팩의 경우 120-180초 권장
 - **"Timed Out" 에러 방지**: 모드팩이 많을수록 로딩 시간이 길어지는 문제를 근본적으로 해결
 
+#### 월드 생성 안정화 (Lake Crash Fix 스타일) ⭐ NEW
+- **호수 생성 크래시 방지**: 커스텀 지형 생성 중 호수 기능이 로드되지 않은 청크의 바이옴을 체크할 때 발생하는 크래시 방지
+- **청크 로드 확인**: 바이옴 체크 전에 해당 위치의 청크가 로드되어 있는지 안전하게 확인
+- **안전한 예외 처리**: 청크가 로드되지 않았거나 예외가 발생하면 안전한 기본값으로 처리
+- **모드팩 호환성**: 커스텀 월드 생성 모드와 함께 사용할 때 안정성 향상
+- **완전 독립 구현**: Lake Feature Fix 모드에서 영감을 받았지만 MCOPT 자체 구현
+
 #### 버킷 미리보기 ⭐ NEW
 - **버킷 내용 툴팁**: 버킷에 담긴 액체나 생명체 정보를 툴팁에 표시해 이름만으로는 구분하기 어려운 경우를 해소
 - **희귀 변이 식별**: 열대어 패턴/색상 조합, 아홀로틀 변종 색상을 바로 보여 레어 물고기나 파란 아홀로틀을 놓치지 않음
@@ -469,6 +476,14 @@ enableLoginTimeoutFix = true
 # 바닐라 기본값: 30초
 # 권장값: 120-180초 (무거운 모드팩의 경우)
 loginTimeoutSeconds = 120
+```
+
+#### 월드 생성 안정화
+```toml
+[gameplay.world_generation]
+# 커스텀 지형 생성 중 호수 기능으로 인한 크래시를 방지합니다
+# 로드되지 않은 청크의 바이옴을 확인할 때 발생하는 오류를 안전하게 처리합니다
+enableLakeCrashFix = true
 ```
 
 #### Experience Orb Merging
@@ -834,6 +849,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   - **Dynamic FPS / FPS Reducer**: FPS throttling concepts
   - **Fishing Rod Fix**: Fishing bobber cleanup patterns
   - **Redirected**: Portal redirect mechanism inspiration
+  - **Lake Feature Fix**: Lake generation crash prevention patterns
 - All implementations are original and independent
 - Thanks to the NeoForge team for the excellent modding platform
 
