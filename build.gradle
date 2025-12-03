@@ -1,0 +1,119 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id 'eclipse'
+    id 'net.neoforged.gradle.userdev' version '7.1.4'
+    id 'me.champeau.jmh' version '0.7.2' apply false
+}
+
+// Apply JMH plugin conditionally for benchmarking
+if (project.hasProperty('enableJmh')) {
+    apply plugin: 'me.champeau.jmh'
+}
+
+version = project.mod_version
+group = 'com.randomstrangerpassenger.mcopt'
+
+base {
+    archivesName = project.mod_id
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(project.java_version)
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+runs {
+    configureEach {
+        systemProperty 'forge.logging.markers', 'REGISTRIES'
+        systemProperty 'forge.logging.console.level', 'debug'
+        systemProperty 'mixin.env.remapRefMap', 'true'
+        systemProperty 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+        modSource project.sourceSets.main
+    }
+
+    client {
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+    }
+
+    server {
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+        programArgument '--nogui'
+    }
+
+    gameTestServer {
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+    }
+
+    // Note: 'data' run type is not available by default in NeoGradle 7.1.4
+    // If you need data generation, define a custom run configuration
+    // data {
+    //     programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    // }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+dependencies {
+    implementation "net.neoforged:neoforge:${neoforge_version}"
+
+    // JMH dependencies for benchmarking (only when enabled)
+    if (project.hasProperty('enableJmh')) {
+        jmh 'org.openjdk.jmh:jmh-core:1.37'
+        jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
+    }
+
+    // JUnit 5 (Jupiter) dependencies for unit testing
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.1'
+
+    // Mockito for mocking in tests
+    testImplementation 'org.mockito:mockito-core:5.8.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.8.0'
+
+    // AssertJ for fluent assertions (optional but recommended)
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+// Configure test task to use JUnit Platform
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = false
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+            'Specification-Title': project.mod_id,
+            'Specification-Vendor': project.mod_author,
+            'Specification-Version': '1',
+            'Implementation-Title': project.mod_name,
+            'Implementation-Version': project.mod_version,
+            'Implementation-Vendor': project.mod_author,
+            'MixinConfigs': 'mcopt.mixins.json'
+        ])
+    }
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}

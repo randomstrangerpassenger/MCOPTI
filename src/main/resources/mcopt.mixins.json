@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.randomstrangerpassenger.mcopt.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "mcopt.refmap.json",
+  "mixins": [
+    "server.BeeStuckFixMixin",
+    "server.EntityPortalMixin",
+    "accessor.MobAccessor",
+    "accessor.ExperienceOrbAccessor",
+    "accessor.EnchantmentMenuAccessor"
+  ],
+  "client": [
+    "client.ParticleEngineMixin",
+    "client.RenderSectionMixin",
+    "accessor.RenderSectionAccessor",
+    "client.ParticleMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

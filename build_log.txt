@@ -1,0 +1,98 @@
+﻿Initialized native services in: C:\Users\MW\.gradle\native
+Initialized jansi services in: C:\Users\MW\.gradle\native
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.14/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Starting process 'Gradle build daemon'. Working directory: C:\Users\MW\.gradle\daemon\8.14 Command: C:\Program Files\Java\jdk-17\bin\java.exe --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED -Xmx3G -Dfile.encoding=UTF-8 -Duser.country=KR -Duser.language=ko -Duser.variant -cp C:\Users\MW\.gradle\wrapper\dists\gradle-8.14-bin\38aieal9i53h9rfe7vjup95b9\gradle-8.14\lib\gradle-daemon-main-8.14.jar -javaagent:C:\Users\MW\.gradle\wrapper\dists\gradle-8.14-bin\38aieal9i53h9rfe7vjup95b9\gradle-8.14\lib\agents\gradle-instrumentation-agent-8.14.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.14
+Successfully started process 'Gradle build daemon'
+An attempt to start the daemon took 1.326 secs.
+The client will now receive all logging from the daemon (pid: 7748). The daemon log file: C:\Users\MW\.gradle\daemon\8.14\daemon-7748.out.log
+Daemon will be stopped at the end of the build 
+Using 12 worker leases.
+Received JVM installation metadata from 'C:\Program Files\Java\jdk-17': {JAVA_HOME=C:\Program Files\Java\jdk-17, JAVA_VERSION=17.0.12, JAVA_VENDOR=Oracle Corporation, RUNTIME_NAME=Java(TM) SE Runtime Environment, RUNTIME_VERSION=17.0.12+8-LTS-286, VM_NAME=Java HotSpot(TM) 64-Bit Server VM, VM_VERSION=17.0.12+8-LTS-286, VM_VENDOR=Oracle Corporation, OS_ARCH=amd64}
+Watching the file system is configured to be enabled if available
+Now considering [C:\Users\MW\Downloads\coding\MCOPTI] as hierarchies to watch
+File system watching is active
+Starting Build
+Resolved plugin [id: 'org.gradle.toolchains.foojay-resolver-convention', version: '0.8.0']
+Settings evaluated using settings file 'C:\Users\MW\Downloads\coding\MCOPTI\settings.gradle'.
+Projects loaded. Root project using build file 'C:\Users\MW\Downloads\coding\MCOPTI\build.gradle'.
+Included projects: [root project 'mcopt']
+
+> Configure project :
+Evaluating root project 'mcopt' using build file 'C:\Users\MW\Downloads\coding\MCOPTI\build.gradle'.
+Resolved plugin [id: 'java']
+Resolved plugin [id: 'idea']
+Resolved plugin [id: 'eclipse']
+Resolved plugin [id: 'net.neoforged.gradle.userdev', version: '7.1.4']
+Resolved plugin [id: 'me.champeau.jmh', version: '0.7.2', apply: false]
+-------------------------------------
+NeoGradle detected a problem with your project: Run.getProgramArguments()
+Details: The method getProgramArguments() is deprecated and will be removed in the future
+Potential Solution: Use getArguments() instead of getProgramArguments()
+More information: https://github.com/neoforged/NeoGradle/blob/NG_7.1/README.md#common-runs-configuration-types-configure-by-type
+-------------------------------------
+-------------------------------------
+NeoGradle detected a problem with your project: Run.getProgramArguments()
+Details: The method getProgramArguments() is deprecated and will be removed in the future
+Potential Solution: Use getArguments() instead of getProgramArguments()
+More information: https://github.com/neoforged/NeoGradle/blob/NG_7.1/README.md#common-runs-configuration-types-configure-by-type
+-------------------------------------
+
+[Incubating] Problems report is available at: file:///C:/Users/MW/Downloads/coding/MCOPTI/build/reports/problems/problems-report.html
+.\gradlew.bat : 
+At line:1 char:1
++ .\gradlew.bat compil
+eJava --info --no-daem
+on 2>&1 | Out-File -Fi
+lePat ...
++ ~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: (:String) [   
+ ], RemoteExceptio    
+n
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+FAILURE: Build failed 
+with an exception.
+
+* What went wrong:
+A problem occurred con
+figuring root project 
+'mcopt'.
+> (The run type 'data'
+ was not found) null.
+  Potential Solution: 
+Ensure the run type is
+ defined in the run or
+ a dependency.
+  More information: ht
+tps://github.com/neofo
+rged/NeoGradle/blob/NG
+_7.1/README.md#common-
+runs-configuration-typ
+es-configure-by-type
+
+* Try:
+> Run with --stacktrac
+e option to get the st
+ack trace.
+> Run with --debug opt
+ion to get more log ou
+tput.
+> Run with --scan to g
+et full insights.
+> Get more help at htt
+ps://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 8s
+Watched directory hierarchies: []
