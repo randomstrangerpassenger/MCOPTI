@@ -53,6 +53,9 @@ public class GameplayConfig {
         public static final ModConfigSpec.BooleanValue ENABLE_LOGIN_TIMEOUT_FIX;
         public static final ModConfigSpec.IntValue LOGIN_TIMEOUT_SECONDS;
 
+        // World Generation Fixes
+        public static final ModConfigSpec.BooleanValue ENABLE_LAKE_CRASH_FIX;
+
         static {
                 BUILDER.comment("MCOPT Gameplay Improvements and Fixes Configuration")
                                 .push("gameplay");
@@ -218,6 +221,17 @@ public class GameplayConfig {
                                                 "권장값: 120-180초 (무거운 모드팩의 경우)",
                                                 "Login handshake timeout in seconds (vanilla default: 30)")
                                 .defineInRange("loginTimeoutSeconds", 120, 30, 600);
+
+                BUILDER.pop();
+
+                BUILDER.comment("World generation crash fixes")
+                                .push("world_generation");
+
+                ENABLE_LAKE_CRASH_FIX = BUILDER
+                                .comment("커스텀 지형 생성 중 호수 기능으로 인한 크래시를 방지합니다",
+                                                "로드되지 않은 청크의 바이옴을 확인할 때 발생하는 오류를 안전하게 처리합니다",
+                                                "Prevents crashes caused by lake generation when checking biomes in unloaded chunks")
+                                .define("enableLakeCrashFix", true);
 
                 BUILDER.pop();
                 BUILDER.pop();
