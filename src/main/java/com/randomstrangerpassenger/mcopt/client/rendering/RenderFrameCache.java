@@ -5,6 +5,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * Per-frame cache for render calculations to avoid redundant computation.
  * This cache is updated once per frame and shared across all render sections.
+<<<<<<< HEAD
  * <p>
  * <b>Design Note: Why Static Fields?</b>
  * <ul>
@@ -20,6 +21,10 @@ import net.minecraft.world.phys.Vec3;
  * <p>
  * Performance impact: Reduces redundant calculations from O(n sections) to O(1
  * per frame)
+=======
+ *
+ * Performance impact: Reduces redundant calculations from O(n sections) to O(1 per frame)
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
  */
 public class RenderFrameCache {
 
@@ -103,8 +108,12 @@ public class RenderFrameCache {
     }
 
     /**
+<<<<<<< HEAD
      * Clear cached values when the client unloads a level to avoid stale world
      * references.
+=======
+     * Clear cached values when the client unloads a level to avoid stale world references.
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
      */
     public static void reset() {
         cameraPosition = Vec3.ZERO;

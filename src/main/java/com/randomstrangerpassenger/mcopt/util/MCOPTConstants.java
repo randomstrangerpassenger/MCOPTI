@@ -2,8 +2,12 @@ package com.randomstrangerpassenger.mcopt.util;
 
 /**
  * Central location for commonly used constants in MCOPT.
+<<<<<<< HEAD
  * Extracting these values improves maintainability and reduces magic numbers in
  * the codebase.
+=======
+ * Extracting these values improves maintainability and reduces magic numbers in the codebase.
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
  */
 public final class MCOPTConstants {
 
@@ -15,8 +19,12 @@ public final class MCOPTConstants {
      * Minecraft world constants
      */
     public static final class Minecraft {
+<<<<<<< HEAD
         private Minecraft() {
         }
+=======
+        private Minecraft() {}
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 
         /** Number of blocks in one chunk section (width/length/height) */
         public static final int CHUNK_SECTION_SIZE = 16;
@@ -27,9 +35,12 @@ public final class MCOPTConstants {
         /** Half of chunk section size - offset to chunk center */
         public static final double CHUNK_CENTER_OFFSET = 8.0;
 
+<<<<<<< HEAD
         /** Ticks per second in Minecraft (20 ticks = 1 second) */
         public static final double TICKS_PER_SECOND = 20.0;
 
+=======
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
         /** Distance threshold for entity back-face culling (in blocks squared) */
         public static final double ENTITY_BACKFACE_CULLING_DISTANCE_SQ = 256.0; // 16 blocks squared
     }
@@ -38,8 +49,12 @@ public final class MCOPTConstants {
      * UI and rendering constants
      */
     public static final class UI {
+<<<<<<< HEAD
         private UI() {
         }
+=======
+        private UI() {}
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 
         /** Default horizontal margin for HUD elements */
         public static final int HUD_MARGIN_X = 5;
@@ -64,8 +79,12 @@ public final class MCOPTConstants {
      * Performance and timing constants
      */
     public static final class Performance {
+<<<<<<< HEAD
         private Performance() {
         }
+=======
+        private Performance() {}
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 
         /** Cooldown period for panic button to prevent spam (milliseconds) */
         public static final long PANIC_BUTTON_COOLDOWN_MS = 5000L;
@@ -76,12 +95,15 @@ public final class MCOPTConstants {
         /** Back-face culling dot product threshold */
         public static final double BACKFACE_CULLING_DOT_THRESHOLD = -0.5;
 
+<<<<<<< HEAD
         /** Maximum number of particles that can spawn per tick */
         public static final int PARTICLE_SPAWN_LIMIT_PER_TICK = 256;
 
         /** Distance squared beyond which particles are culled (48 blocks) */
         public static final double PARTICLE_CULL_DISTANCE_SQ = 48.0 * 48.0;
 
+=======
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
         /** Milliseconds per second conversion factor */
         public static final long MILLIS_PER_SECOND = 1000L;
     }
@@ -90,6 +112,7 @@ public final class MCOPTConstants {
      * Fishing mechanics constants
      */
     public static final class Fishing {
+<<<<<<< HEAD
         private Fishing() {
         }
 
@@ -98,6 +121,13 @@ public final class MCOPTConstants {
          * breaks.
          * This matches vanilla Minecraft's fishing rod range limit (32 blocks squared =
          * 1024).
+=======
+        private Fishing() {}
+
+        /**
+         * Maximum distance squared between player and fishing hook before the line breaks.
+         * This matches vanilla Minecraft's fishing rod range limit (32 blocks squared = 1024).
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
          */
         public static final double MAX_FISHING_DISTANCE_SQUARED = 1024.0D;
     }
@@ -106,8 +136,12 @@ public final class MCOPTConstants {
      * World and dimension constants
      */
     public static final class World {
+<<<<<<< HEAD
         private World() {
         }
+=======
+        private World() {}
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 
         /**
          * Minimum Y coordinate in Minecraft worlds (build limit).
@@ -144,8 +178,12 @@ public final class MCOPTConstants {
      * Input and event handling constants
      */
     public static final class Input {
+<<<<<<< HEAD
         private Input() {
         }
+=======
+        private Input() {}
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 
         /**
          * GLFW key/mouse action code for key release.

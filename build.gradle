@@ -51,11 +51,17 @@ runs {
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
     }
 
+<<<<<<< HEAD
     // Note: 'data' run type is not available by default in NeoGradle 7.1.4
     // If you need data generation, define a custom run configuration
     // data {
     //     programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     // }
+=======
+    data {
+        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    }
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }

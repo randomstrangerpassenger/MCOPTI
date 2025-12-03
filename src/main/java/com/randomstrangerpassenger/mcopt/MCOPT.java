@@ -1,6 +1,7 @@
 package com.randomstrangerpassenger.mcopt;
 
 import com.randomstrangerpassenger.mcopt.config.MCOPTConfig;
+<<<<<<< HEAD
 import com.randomstrangerpassenger.mcopt.config.RenderingConfig;
 import com.randomstrangerpassenger.mcopt.config.PerformanceConfig;
 import com.randomstrangerpassenger.mcopt.config.SafetyConfig;
@@ -11,12 +12,28 @@ import com.randomstrangerpassenger.mcopt.safety.ActionGuardHandler;
 import com.randomstrangerpassenger.mcopt.client.fps.DynamicFpsManager;
 import net.neoforged.bus.api.IEventBus;
 
+=======
+import com.randomstrangerpassenger.mcopt.server.ai.AIOptimizationSystem;
+import com.randomstrangerpassenger.mcopt.server.entity.clearlag.ClearLagManager;
+import com.randomstrangerpassenger.mcopt.server.entity.golem.GolemSpawnFixHandler;
+import com.randomstrangerpassenger.mcopt.client.fps.DynamicFpsManager;
+import com.randomstrangerpassenger.mcopt.client.bucket.BucketPreviewHandler;
+import com.randomstrangerpassenger.mcopt.util.FeatureToggles;
+import com.randomstrangerpassenger.mcopt.safety.ActionGuardHandler;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.DistExecutor;
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+<<<<<<< HEAD
 import net.neoforged.neoforge.common.NeoForge;
+=======
+import net.neoforged.neoforge.common.MinecraftForge;
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +56,17 @@ public class MCOPT {
         modEventBus.addListener(FeatureToggles::onModConfigReloaded);
 
         // Event handlers
+<<<<<<< HEAD
 
         if (FeatureToggles.isEnabled(FeatureKey.ACTION_GUARD)) {
             NeoForge.EVENT_BUS.register(new ActionGuardHandler());
+=======
+        MinecraftForge.EVENT_BUS.register(new GolemSpawnFixHandler());
+        MinecraftForge.EVENT_BUS.register(new ClearLagManager());
+
+        if (FeatureToggles.isActionGuardEnabled()) {
+            MinecraftForge.EVENT_BUS.register(new ActionGuardHandler());
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
         }
 
         // Register setup handlers
@@ -55,25 +80,41 @@ public class MCOPT {
         LOGGER.info("MCOPT common setup");
 
         // Initialize AI optimization system
+<<<<<<< HEAD
         if (FeatureToggles.isEnabled(FeatureKey.AI_OPTIMIZATIONS)) {
             event.enqueueWork(() -> {
 
+=======
+        if (FeatureToggles.isAiOptimizationsEnabled()) {
+            event.enqueueWork(() -> {
+                AIOptimizationSystem.init();
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
                 LOGGER.info("AI optimization system: ENABLED");
             });
         }
 
+<<<<<<< HEAD
         if (SafetyConfig.ENABLE_MAX_HEALTH_STABILITY.get()) {
             LOGGER.info("Max health stability fix: ENABLED");
         }
 
         if (SafetyConfig.ENABLE_ATTRIBUTE_RANGE_EXPANSION.get()) {
             LOGGER.info("Attribute cap expansion: ENABLED (max {})", SafetyConfig.ATTRIBUTE_MAX_LIMIT.get());
+=======
+        if (MCOPTConfig.ENABLE_MAX_HEALTH_STABILITY.get()) {
+            LOGGER.info("Max health stability fix: ENABLED");
+        }
+
+        if (MCOPTConfig.ENABLE_ATTRIBUTE_RANGE_EXPANSION.get()) {
+            LOGGER.info("Attribute cap expansion: ENABLED (max {})", MCOPTConfig.ATTRIBUTE_MAX_LIMIT.get());
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
         }
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {
         LOGGER.info("MCOPT client setup - Loading client-side optimizations");
 
+<<<<<<< HEAD
         if (RenderingConfig.ENABLE_CHUNK_OPTIMIZATIONS.get()) {
             LOGGER.info("Chunk rendering optimizations: ENABLED");
         }
@@ -100,13 +141,52 @@ public class MCOPT {
                 LOGGER.info("  - Math caching: ENABLED");
             }
             if (PerformanceConfig.ENABLE_OPTIMIZED_LOOK_CONTROL.get()) {
+=======
+        if (MCOPTConfig.ENABLE_CHUNK_OPTIMIZATIONS.get()) {
+            LOGGER.info("Chunk rendering optimizations: ENABLED");
+        }
+
+        if (MCOPTConfig.ENABLE_ENTITY_CULLING.get()) {
+            LOGGER.info("Entity culling optimizations: ENABLED");
+        }
+
+        if (MCOPTConfig.ENABLE_PARTICLE_OPTIMIZATIONS.get()) {
+            LOGGER.info("Particle system optimizations: ENABLED");
+        }
+
+        if (FeatureToggles.isXpOrbMergingEnabled()) {
+            LOGGER.info("Experience orb merging optimizations: ENABLED");
+        }
+
+        if (FeatureToggles.isLeakGuardEnabled()) {
+            LOGGER.info("Leak guard (AllTheLeaks-style world leak detection): ENABLED");
+        }
+
+        if (FeatureToggles.isAiOptimizationsEnabled()) {
+            LOGGER.info("AI optimization: ENABLED");
+            if (MCOPTConfig.ENABLE_MATH_CACHE.get()) {
+                LOGGER.info("  - Math caching: ENABLED");
+            }
+            if (MCOPTConfig.ENABLE_OPTIMIZED_LOOK_CONTROL.get()) {
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
                 LOGGER.info("  - Optimized LookControl: ENABLED");
             }
         }
 
+<<<<<<< HEAD
         if (FeatureToggles.isEnabled(FeatureKey.DYNAMIC_FPS)) {
             LOGGER.info("Dynamic FPS controller: ENABLED");
             NeoForge.EVENT_BUS.register(new DynamicFpsManager());
+=======
+        if (FeatureToggles.isDynamicFpsEnabled()) {
+            LOGGER.info("Dynamic FPS controller: ENABLED");
+            MinecraftForge.EVENT_BUS.register(new DynamicFpsManager());
+        }
+
+        if (MCOPTConfig.ENABLE_BUCKET_PREVIEW.get()) {
+            LOGGER.info("Bucket preview tooltips: ENABLED");
+            MinecraftForge.EVENT_BUS.register(new BucketPreviewHandler());
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
         }
     }
 }

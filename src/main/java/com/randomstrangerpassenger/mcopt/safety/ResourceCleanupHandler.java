@@ -1,7 +1,11 @@
 package com.randomstrangerpassenger.mcopt.safety;
 
 import com.randomstrangerpassenger.mcopt.MCOPT;
+<<<<<<< HEAD
 import com.randomstrangerpassenger.mcopt.config.PerformanceConfig;
+=======
+import com.randomstrangerpassenger.mcopt.config.MCOPTConfig;
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -13,7 +17,11 @@ import net.neoforged.neoforge.event.level.LevelEvent;
  * Handles aggressive resource cleanup on world unload and disconnect events.
  * Clears unused caches and object pools to prevent memory leaks.
  */
+<<<<<<< HEAD
 @EventBusSubscriber(modid = MCOPT.MOD_ID, value = Dist.CLIENT)
+=======
+@EventBusSubscriber(modid = MCOPT.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 public class ResourceCleanupHandler {
 
     /**
@@ -21,7 +29,11 @@ public class ResourceCleanupHandler {
      */
     @SubscribeEvent
     public static void onClientLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+<<<<<<< HEAD
         if (!PerformanceConfig.ENABLE_MEMORY_OPTIMIZATIONS.get() || !PerformanceConfig.ENABLE_RESOURCE_CLEANUP.get()) {
+=======
+        if (!MCOPTConfig.ENABLE_MEMORY_OPTIMIZATIONS.get() || !MCOPTConfig.ENABLE_RESOURCE_CLEANUP.get()) {
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
             return;
         }
 
@@ -34,7 +46,11 @@ public class ResourceCleanupHandler {
      */
     @SubscribeEvent
     public static void onLevelUnload(LevelEvent.Unload event) {
+<<<<<<< HEAD
         if (!PerformanceConfig.ENABLE_MEMORY_OPTIMIZATIONS.get() || !PerformanceConfig.ENABLE_RESOURCE_CLEANUP.get()) {
+=======
+        if (!MCOPTConfig.ENABLE_MEMORY_OPTIMIZATIONS.get() || !MCOPTConfig.ENABLE_RESOURCE_CLEANUP.get()) {
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
             return;
         }
 

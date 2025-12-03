@@ -1,9 +1,13 @@
 package com.randomstrangerpassenger.mcopt.util;
 
 import com.randomstrangerpassenger.mcopt.MCOPT;
+<<<<<<< HEAD
 import com.randomstrangerpassenger.mcopt.config.PerformanceConfig;
 import com.randomstrangerpassenger.mcopt.config.GameplayConfig;
 import com.randomstrangerpassenger.mcopt.config.SafetyConfig;
+=======
+import com.randomstrangerpassenger.mcopt.config.MCOPTConfig;
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
@@ -23,6 +27,7 @@ import java.util.function.BooleanSupplier;
  */
 public final class FeatureToggles {
 
+<<<<<<< HEAD
     private static final Map<FeatureKey, FeatureToggle> TOGGLES = new EnumMap<>(FeatureKey.class);
 
     static {
@@ -49,6 +54,39 @@ public final class FeatureToggles {
 
         register(FeatureKey.ACTION_GUARD,
                 SafetyConfig.ENABLE_ACTION_GUARD::get,
+=======
+    private static final Map<String, FeatureToggle> TOGGLES = new LinkedHashMap<>();
+
+    static {
+        // Register all feature toggles with their configuration and incompatible mods
+        register("xpOrbMerging",
+                MCOPTConfig.ENABLE_XP_ORB_MERGING::get,
+                "XP Orb merging",
+                "clumps");
+
+        register("aiOptimizations",
+                MCOPTConfig.ENABLE_AI_OPTIMIZATIONS::get,
+                "AI optimization",
+                "aiimprovements");
+
+        register("leakGuard",
+                MCOPTConfig.ENABLE_LEAK_GUARD::get,
+                "Leak Guard",
+                "alltheleaks", "memoryleakfix");
+
+        register("dynamicFps",
+                MCOPTConfig.ENABLE_DYNAMIC_FPS::get,
+                "Dynamic FPS controller",
+                "dynamic_fps", "fps_reducer");
+
+        register("betterSnowLogic",
+                () -> MCOPTConfig.ENABLE_SNOW_ACCUMULATION_FIX.get() && MCOPTConfig.ENABLE_BETTER_SNOW_LOGIC.get(),
+                "Better Snow Logic");
+
+        register("actionGuard",
+                MCOPTConfig.ENABLE_ACTION_GUARD::get,
+                "Action Guard",
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
                 "dontdothat");
     }
 
@@ -58,6 +96,7 @@ public final class FeatureToggles {
     /**
      * Register a feature toggle.
      *
+<<<<<<< HEAD
      * @param key              Enum key for the feature
      * @param configSupplier   Supplier that returns the config value
      * @param incompatibleMods Mod IDs that conflict with this feature
@@ -65,6 +104,15 @@ public final class FeatureToggles {
     private static void register(FeatureKey key, BooleanSupplier configSupplier,
             String... incompatibleMods) {
         TOGGLES.put(key, new FeatureToggle(configSupplier, key.getDisplayName(), incompatibleMods));
+=======
+     * @param key Unique identifier for the feature
+     * @param configSupplier Supplier that returns the config value
+     * @param displayName Human-readable name for logging
+     * @param incompatibleMods Mod IDs that conflict with this feature
+     */
+    private static void register(String key, BooleanSupplier configSupplier, String displayName, String... incompatibleMods) {
+        TOGGLES.put(key, new FeatureToggle(configSupplier, displayName, incompatibleMods));
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
     }
 
     /**
@@ -74,8 +122,13 @@ public final class FeatureToggles {
     public static void refreshFromConfig() {
         ModList modList = ModList.get();
 
+<<<<<<< HEAD
         for (Map.Entry<FeatureKey, FeatureToggle> entry : TOGGLES.entrySet()) {
             FeatureKey key = entry.getKey();
+=======
+        for (Map.Entry<String, FeatureToggle> entry : TOGGLES.entrySet()) {
+            String key = entry.getKey();
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
             FeatureToggle toggle = entry.getValue();
 
             boolean configEnabled = toggle.configSupplier.getAsBoolean();
@@ -92,13 +145,48 @@ public final class FeatureToggles {
         }
     }
 
+<<<<<<< HEAD
     /**
      * Check if a feature is enabled.
+=======
+    // Public getters for backward compatibility
+
+    public static boolean isXpOrbMergingEnabled() {
+        return isEnabled("xpOrbMerging");
+    }
+
+    public static boolean isAiOptimizationsEnabled() {
+        return isEnabled("aiOptimizations");
+    }
+
+    public static boolean isLeakGuardEnabled() {
+        return isEnabled("leakGuard");
+    }
+
+    public static boolean isDynamicFpsEnabled() {
+        return isEnabled("dynamicFps");
+    }
+
+    public static boolean isBetterSnowLogicEnabled() {
+        return isEnabled("betterSnowLogic");
+    }
+
+    public static boolean isActionGuardEnabled() {
+        return isEnabled("actionGuard");
+    }
+
+    /**
+     * Check if a feature is enabled by its key.
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
      *
      * @param key Feature key
      * @return true if the feature is enabled, false otherwise
      */
+<<<<<<< HEAD
     public static boolean isEnabled(FeatureKey key) {
+=======
+    private static boolean isEnabled(String key) {
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
         FeatureToggle toggle = TOGGLES.get(key);
         return toggle != null && toggle.enabled.get();
     }
@@ -111,8 +199,12 @@ public final class FeatureToggles {
     }
 
     /**
+<<<<<<< HEAD
      * Represents a single feature toggle with its configuration and compatibility
      * rules.
+=======
+     * Represents a single feature toggle with its configuration and compatibility rules.
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
      */
     private static class FeatureToggle {
         private final BooleanSupplier configSupplier;

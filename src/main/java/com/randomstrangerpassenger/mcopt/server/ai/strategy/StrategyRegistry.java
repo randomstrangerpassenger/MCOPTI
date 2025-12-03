@@ -23,7 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * - Extensible - mods can register custom strategies
  * <p>
  * Usage:
+<<<<<<< HEAD
  * 
+=======
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
  * <pre>{@code
  * // Register a strategy (typically during mod initialization)
  * StrategyRegistry.register(new FarmAnimalStrategy());
@@ -44,7 +47,12 @@ public class StrategyRegistry {
      * Key: EntityType tag
      * Value: Pre-built and cached ModifierChain
      */
+<<<<<<< HEAD
     private static final Map<TagKey<EntityType<?>>, ModifierChain> modifierCache = new ConcurrentHashMap<>();
+=======
+    private static final Map<TagKey<EntityType<?>>, ModifierChain> modifierCache =
+            new ConcurrentHashMap<>();
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 
     /**
      * Thread-safe initialization flag.
@@ -77,7 +85,11 @@ public class StrategyRegistry {
             register(new FarmAnimalStrategy());
             register(new WoolGrowingStrategy());
             register(new FishStrategy());
+<<<<<<< HEAD
             // register(new SquidStrategy());
+=======
+            register(new SquidStrategy());
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 
             // Sort strategies by priority (highest first)
             sortStrategies();
@@ -240,4 +252,8 @@ public class StrategyRegistry {
             MCOPT.LOGGER.warn("Strategy Registry has been reset (test mode)");
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0

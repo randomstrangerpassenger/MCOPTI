@@ -6,6 +6,7 @@
   "refmap": "mcopt.refmap.json",
   "mixins": [
     "server.BeeStuckFixMixin",
+<<<<<<< HEAD
     "server.EntityPortalMixin",
     "accessor.MobAccessor",
     "accessor.ExperienceOrbAccessor",
@@ -15,9 +16,19 @@
     "client.ParticleEngineMixin",
     "client.RenderSectionMixin",
     "accessor.RenderSectionAccessor",
+=======
+    "server.EntityPortalMixin"
+  ],
+  "client": [
+    "client.ParticleEngineMixin",
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
     "client.ParticleMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0

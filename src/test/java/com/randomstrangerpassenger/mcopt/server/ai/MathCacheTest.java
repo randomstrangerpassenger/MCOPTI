@@ -27,7 +27,11 @@ import static org.assertj.core.api.Assertions.*;
 @DisplayName("MathCache Unit Tests")
 class MathCacheTest {
 
+<<<<<<< HEAD
     private static final float ATAN2_TOLERANCE = 0.05f; // ~3 degrees error tolerance
+=======
+    private static final double ATAN2_TOLERANCE = 0.05; // ~3 degrees error tolerance
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
     private static final float TRIG_TOLERANCE = 0.001f; // 0.1% error tolerance for sin/cos
 
     @BeforeAll
@@ -93,6 +97,7 @@ class MathCacheTest {
     @ParameterizedTest
     @DisplayName("Should calculate atan2 accurately for common cases")
     @CsvSource({
+<<<<<<< HEAD
             "1.0, 1.0", // 45 degrees
             "1.0, 0.0", // 90 degrees
             "0.0, 1.0", // 0 degrees
@@ -101,6 +106,16 @@ class MathCacheTest {
             "-1.0, -1.0", // -135 degrees
             "5.0, 3.0", // Random positive
             "-3.0, 7.0", // Random mixed
+=======
+            "1.0, 1.0",      // 45 degrees
+            "1.0, 0.0",      // 90 degrees
+            "0.0, 1.0",      // 0 degrees
+            "-1.0, 1.0",     // -45 degrees
+            "1.0, -1.0",     // 135 degrees
+            "-1.0, -1.0",    // -135 degrees
+            "5.0, 3.0",      // Random positive
+            "-3.0, 7.0",     // Random mixed
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
     })
     void testAtan2Accuracy(double y, double x) {
         float cached = MathCache.atan2(y, x);
@@ -167,10 +182,100 @@ class MathCacheTest {
                 .isCloseTo((float) expected, within(ATAN2_TOLERANCE));
     }
 
+<<<<<<< HEAD
     // ========== sin/cos tests removed (tables were removed from MathCache)
     // ==========
 
     // sin/cos tests removed - those methods were deleted from MathCache
+=======
+    // ========== sin/cos Accuracy Tests ==========
+
+    @ParameterizedTest
+    @DisplayName("Should calculate sin accurately for common angles (degrees)")
+    @ValueSource(floats = {0f, 30f, 45f, 60f, 90f, 180f, 270f, 360f})
+    void testSinAccuracyDegrees(float degrees) {
+        float cached = MathCache.sin(degrees);
+        float expected = (float) Math.sin(Math.toRadians(degrees));
+
+        assertThat(cached)
+                .as("sin(%f°) should be close to Math.sin", degrees)
+                .isCloseTo(expected, within(TRIG_TOLERANCE));
+    }
+
+    @ParameterizedTest
+    @DisplayName("Should calculate cos accurately for common angles (degrees)")
+    @ValueSource(floats = {0f, 30f, 45f, 60f, 90f, 180f, 270f, 360f})
+    void testCosAccuracyDegrees(float degrees) {
+        float cached = MathCache.cos(degrees);
+        float expected = (float) Math.cos(Math.toRadians(degrees));
+
+        assertThat(cached)
+                .as("cos(%f°) should be close to Math.cos", degrees)
+                .isCloseTo(expected, within(TRIG_TOLERANCE));
+    }
+
+    @ParameterizedTest
+    @DisplayName("Should calculate sin accurately for common angles (radians)")
+    @ValueSource(floats = {0f, 1.5708f, 3.1416f, 4.7124f, 6.2832f}) // 0, π/2, π, 3π/2, 2π
+    void testSinAccuracyRadians(float radians) {
+        float cached = MathCache.sinRad(radians);
+        float expected = (float) Math.sin(radians);
+
+        assertThat(cached)
+                .as("sinRad(%f) should be close to Math.sin", radians)
+                .isCloseTo(expected, within(TRIG_TOLERANCE));
+    }
+
+    @ParameterizedTest
+    @DisplayName("Should calculate cos accurately for common angles (radians)")
+    @ValueSource(floats = {0f, 1.5708f, 3.1416f, 4.7124f, 6.2832f}) // 0, π/2, π, 3π/2, 2π
+    void testCosAccuracyRadians(float radians) {
+        float cached = MathCache.cosRad(radians);
+        float expected = (float) Math.cos(radians);
+
+        assertThat(cached)
+                .as("cosRad(%f) should be close to Math.cos", radians)
+                .isCloseTo(expected, within(TRIG_TOLERANCE));
+    }
+
+    @Test
+    @DisplayName("Should satisfy Pythagorean identity: sin²(x) + cos²(x) = 1")
+    void testPythagoreanIdentity() {
+        for (float degrees = 0; degrees < 360; degrees += 15) {
+            float sinVal = MathCache.sin(degrees);
+            float cosVal = MathCache.cos(degrees);
+            float sumOfSquares = sinVal * sinVal + cosVal * cosVal;
+
+            assertThat(sumOfSquares)
+                    .as("sin²(%f°) + cos²(%f°) should equal 1", degrees, degrees)
+                    .isCloseTo(1.0f, within(0.01f)); // Slightly larger tolerance due to table lookup
+        }
+    }
+
+    @Test
+    @DisplayName("Should handle negative angles correctly")
+    void testNegativeAngles() {
+        float degrees = -45f;
+        float cached = MathCache.sin(degrees);
+        float expected = (float) Math.sin(Math.toRadians(degrees));
+
+        assertThat(cached)
+                .as("sin of negative angle should work correctly")
+                .isCloseTo(expected, within(TRIG_TOLERANCE));
+    }
+
+    @Test
+    @DisplayName("Should handle angles greater than 360 degrees")
+    void testLargeAngles() {
+        float degrees = 450f; // 360 + 90
+        float cached = MathCache.sin(degrees);
+        float expected = (float) Math.sin(Math.toRadians(degrees));
+
+        assertThat(cached)
+                .as("sin of angle > 360° should work correctly")
+                .isCloseTo(expected, within(TRIG_TOLERANCE));
+    }
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 
     // ========== Performance Characteristics Tests ==========
 
@@ -188,11 +293,19 @@ class MathCacheTest {
             executor.submit(() -> {
                 try {
                     for (int j = 0; j < iterationsPerThread; j++) {
+<<<<<<< HEAD
                         // Mix of different angles for atan2 testing
                         float angle = (threadId * 37 + j) % 360;
                         MathCache.atan2(angle, angle + 1);
                         MathCache.atan2(angle + 1, angle);
                         MathCache.atan2(-angle, angle);
+=======
+                        // Mix of different function calls
+                        float angle = (threadId * 37 + j) % 360;
+                        MathCache.sin(angle);
+                        MathCache.cos(angle);
+                        MathCache.atan2(angle, angle + 1);
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
                     }
                 } catch (Exception e) {
                     errorCount.incrementAndGet();
@@ -221,7 +334,16 @@ class MathCacheTest {
             MathCache.atan2(1.0, Double.NaN);
             MathCache.atan2(Double.POSITIVE_INFINITY, 1.0);
             MathCache.atan2(1.0, Double.NEGATIVE_INFINITY);
+<<<<<<< HEAD
             MathCache.atan2(0.0, 0.0); // Edge case: both zero
+=======
+        }).doesNotThrowAnyException();
+
+        assertThatCode(() -> {
+            MathCache.sin(Float.NaN);
+            MathCache.cos(Float.POSITIVE_INFINITY);
+            MathCache.sinRad(Float.NEGATIVE_INFINITY);
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
         }).doesNotThrowAnyException();
     }
 
@@ -240,4 +362,8 @@ class MathCacheTest {
                 .isEqualTo(result2)
                 .isEqualTo(result3);
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0

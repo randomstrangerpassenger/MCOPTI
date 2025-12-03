@@ -1,9 +1,14 @@
 package com.randomstrangerpassenger.mcopt.safety;
 
 import com.randomstrangerpassenger.mcopt.MCOPT;
+<<<<<<< HEAD
 import com.randomstrangerpassenger.mcopt.config.SafetyConfig;
 import com.randomstrangerpassenger.mcopt.util.FeatureToggles;
 import com.randomstrangerpassenger.mcopt.util.FeatureKey;
+=======
+import com.randomstrangerpassenger.mcopt.config.MCOPTConfig;
+import com.randomstrangerpassenger.mcopt.util.FeatureToggles;
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,7 +39,11 @@ public class ActionGuardHandler {
 
     @SubscribeEvent
     public void onAttackEntity(AttackEntityEvent event) {
+<<<<<<< HEAD
         if (!FeatureToggles.isEnabled(FeatureKey.ACTION_GUARD)) {
+=======
+        if (!FeatureToggles.isActionGuardEnabled()) {
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
             return;
         }
 
@@ -52,26 +61,43 @@ public class ActionGuardHandler {
             return; // Don't interfere with PvP
         }
 
+<<<<<<< HEAD
         ServerLevel level = serverPlayer.level();
         boolean allowBypass = SafetyConfig.GUARD_ALLOW_SNEAK_BYPASS.get() && player.isShiftKeyDown();
 
         if (target instanceof TamableAnimal tamable) {
             if (SafetyConfig.GUARD_PROTECT_TAMED_PETS.get() && tamable.isTame() && !allowBypass) {
+=======
+        ServerLevel level = serverPlayer.serverLevel();
+        boolean allowBypass = MCOPTConfig.GUARD_ALLOW_SNEAK_BYPASS.get() && player.isShiftKeyDown();
+
+        if (target instanceof TamableAnimal tamable) {
+            if (MCOPTConfig.GUARD_PROTECT_TAMED_PETS.get() && tamable.isTame() && !allowBypass) {
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
                 cancelAttack(event, serverPlayer, level, Component.translatable("mcopt.safety.pet_guard"));
                 return;
             }
         }
 
         if (target instanceof AbstractVillager villager) {
+<<<<<<< HEAD
             if (SafetyConfig.GUARD_PROTECT_VILLAGERS.get() && !allowBypass) {
                 cancelAttack(event, serverPlayer, level,
                         Component.translatable("mcopt.safety.villager_guard", villager.getDisplayName()));
+=======
+            if (MCOPTConfig.GUARD_PROTECT_VILLAGERS.get() && !allowBypass) {
+                cancelAttack(event, serverPlayer, level, Component.translatable("mcopt.safety.villager_guard", villager.getDisplayName()));
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
                 return;
             }
         }
 
         if (target instanceof HangingEntity hanging) {
+<<<<<<< HEAD
             if (SafetyConfig.GUARD_PROTECT_DECORATIONS.get() && !allowBypass && isProtectedDecoration(hanging)) {
+=======
+            if (MCOPTConfig.GUARD_PROTECT_DECORATIONS.get() && !allowBypass && isProtectedDecoration(hanging)) {
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
                 cancelAttack(event, serverPlayer, level, Component.translatable("mcopt.safety.decoration_guard"));
             }
         }
@@ -92,8 +118,12 @@ public class ActionGuardHandler {
         if (gameTime - lastTick >= MESSAGE_COOLDOWN_TICKS) {
             lastWarningTick.put(id, gameTime);
             player.displayClientMessage(message, true);
+<<<<<<< HEAD
             MCOPT.LOGGER.debug("ActionGuard: {} prevented from damaging {}", player.getScoreboardName(),
                     event.getTarget().getName().getString());
+=======
+            MCOPT.LOGGER.debug("ActionGuard: {} prevented from damaging {}", player.getScoreboardName(), event.getTarget().getName().getString());
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
         }
     }
 }

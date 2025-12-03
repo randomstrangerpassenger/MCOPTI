@@ -1,7 +1,11 @@
 package com.randomstrangerpassenger.mcopt.server.entity.health;
 
 import com.randomstrangerpassenger.mcopt.MCOPT;
+<<<<<<< HEAD
 import com.randomstrangerpassenger.mcopt.config.SafetyConfig;
+=======
+import com.randomstrangerpassenger.mcopt.config.MCOPTConfig;
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -11,7 +15,11 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+<<<<<<< HEAD
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+=======
+import net.neoforged.neoforge.event.tick.TickEvent;
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
 
 /**
  * Stabilizes player health when the MAX_HEALTH attribute changes.
@@ -30,11 +38,19 @@ public class HealthStabilityHandler {
     private static final double EPSILON = 0.0001D;
 
     // Cache config value to avoid repeated .get() calls every tick
+<<<<<<< HEAD
     private static boolean enableMaxHealthStability = SafetyConfig.ENABLE_MAX_HEALTH_STABILITY.get();
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (event.getEntity().level().isClientSide()) {
+=======
+    private static boolean enableMaxHealthStability = MCOPTConfig.ENABLE_MAX_HEALTH_STABILITY.get();
+
+    @SubscribeEvent
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.side == LogicalSide.CLIENT || event.phase != TickEvent.Phase.END) {
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
             return;
         }
 
@@ -42,7 +58,11 @@ public class HealthStabilityHandler {
             return;
         }
 
+<<<<<<< HEAD
         Player player = event.getEntity();
+=======
+        Player player = event.player;
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
         UUID uuid = player.getUUID();
 
         double currentMax = player.getAttributeValue(Attributes.MAX_HEALTH);
@@ -64,8 +84,12 @@ public class HealthStabilityHandler {
 
         if (Math.abs(targetHealth - currentHealth) > 0.001F) {
             player.setHealth(targetHealth);
+<<<<<<< HEAD
             MCOPT.LOGGER.debug("Scaled player health to preserve ratio: {} -> {} (max: {} -> {})", currentHealth,
                     targetHealth, previousMax, currentMax);
+=======
+            MCOPT.LOGGER.debug("Scaled player health to preserve ratio: {} -> {} (max: {} -> {})", currentHealth, targetHealth, previousMax, currentMax);
+>>>>>>> 1da28dde83262df0df1d55168e914749d22a9de0
         }
 
         LAST_MAX_HEALTH.put(uuid, currentMax);
