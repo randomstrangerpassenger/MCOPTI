@@ -34,3 +34,7 @@ crash-reports/
 *.swp
 *.swo
 *~
+
+# Build error/log files
+build*.txt
+potion_build_error.txt
