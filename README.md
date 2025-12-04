@@ -219,6 +219,19 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **안정적인 아이템 수집**: 장거리 이동 중에도 Allay가 아이템을 안전하게 운반
 - **완전 독립 구현**: AllayFix 모드에서 영감을 받았지만 MCOPT 자체 Mixin 패턴으로 구현
 
+#### 포션 스택 시스템 (PotionStackingSystem) ⭐ NEW
+- **포션 스택 가능**: 물병, 일반 포션, 투척용 포션, 잔류형 포션을 최대 16개까지 스택 가능
+- **인벤토리 절약**: 포션 보관 공간을 1/16로 줄여 인벤토리 관리 편의성 대폭 향상
+- **설정 가능**: 스택 크기를 1-64 사이로 자유롭게 조절
+- **완전 독립 구현**: Potion Fixes 모드에서 영감을 받았지만 MCOPT 자체 구현
+- **주의사항**: 양조기에서는 스택된 포션을 1개씩 분리하여 사용 권장
+
+#### 조용한 번개 (SilentLightningFix) ⭐ NEW
+- **Silent 태그 지원**: 번개에 Silent 태그가 있으면 소리를 재생하지 않음
+- **명령어 호환**: `/summon minecraft:lightning_bolt ~ ~ ~ {Silent:1b}` 명령어 지원
+- **맵 제작자 친화적**: 커스텀 맵이나 데이터팩에서 조용한 번개 효과 사용 가능
+- **완전 독립 구현**: SilentLightningFix 모드에서 영감을 받았지만 MCOPT 자체 구현
+
 #### Entity AI Optimization ⭐ NEW
 - **Math Function Caching**: Pre-computed atan2, sin, cos lookup tables for AI calculations
 - **Optimized LookControl**: Replaces mob LookControl with cached math version
@@ -533,6 +546,15 @@ enableInstantWakeup = true
 enableAllayPersistenceFix = true
 ```
 
+#### 조용한 번개
+```toml
+[safety.silent_lightning]
+# 번개가 Silent 태그를 가지고 있을 때 소리를 재생하지 않습니다
+# Prevents lightning from playing sound when it has the Silent tag
+# 명령어로 조용한 번개를 소환할 때 유용합니다
+enableSilentLightningFix = true
+```
+
 #### 청크 당 엔티티 제한
 ```toml
 [safety.per_chunk_entity_limit]
@@ -610,6 +632,21 @@ clearLagSkipNamedItems = true
 # 제거 대상에서 제외할 엔티티 ID 리스트
 clearLagEntityWhitelist = ["minecraft:armor_stand"]
 ```
+
+#### 포션 스택 시스템
+```toml
+[gameplay.potion_stacking]
+# 물병과 포션을 겹칠 수 있게 합니다
+# Allows potions and bottles to stack
+enablePotionStacking = true
+
+# 포션/물병의 최대 스택 크기 (1-64)
+# Maximum stack size for potions and bottles
+potionStackSize = 16
+```
+
+> [!NOTE]
+> 양조기 사용 시: 스택된 포션을 1개씩 분리하여 넣는 것을 권장합니다.
 
 #### Entity AI Optimization
 ```toml

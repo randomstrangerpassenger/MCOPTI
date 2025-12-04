@@ -56,19 +56,17 @@ public abstract class InstantWakeupFixMixin {
         }
 
         try {
-            // Cast this to ServerLevel to access server and game rules
-            ServerLevel self = (ServerLevel) (Object) this;
-
             // Get the current game time and day time
-            long gameTime = self.getGameTime();
+            long gameTime = ((ServerLevel) (Object) this).getGameTime();
             long dayTime = this.getDayTime();
 
             // Create and broadcast the time packet to all players
             ClientboundSetTimePacket packet = new ClientboundSetTimePacket(
                     gameTime,
                     dayTime,
-                    self.getGameRules().getBoolean(net.minecraft.world.level.GameRules.RULE_DAYLIGHT));
-            self.getServer().getPlayerList().broadcastAll(packet);
+                    ((ServerLevel) (Object) this).getGameRules()
+                            .getBoolean(net.minecraft.world.level.GameRules.RULE_DAYLIGHT));
+            ((ServerLevel) (Object) this).getServer().getPlayerList().broadcastAll(packet);
 
         } catch (Exception e) {
             // Fail silently to avoid breaking the game

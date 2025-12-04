@@ -55,12 +55,6 @@ public class ItemFrameSilenceFix {
             return false;
         }
 
-        // firstTick이 true면 아직 첫 틱을 완료하지 않은 상태
-        // 엔티티가 처음 월드에 추가되었을 때를 의미
-        if (entity.firstTick) {
-            return false;
-        }
-
         // 그 외의 경우는 플레이어가 직접 설치한 것으로 판단하여 소리 재생
         return true;
     }
@@ -77,6 +71,6 @@ public class ItemFrameSilenceFix {
         if (entity == null) {
             return false;
         }
-        return entity.tickCount == 0 || entity.firstTick;
+        return entity.tickCount == 0;
     }
 }

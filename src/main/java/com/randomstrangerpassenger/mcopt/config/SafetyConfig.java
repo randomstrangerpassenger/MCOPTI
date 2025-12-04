@@ -48,6 +48,9 @@ public class SafetyConfig {
         // Allay Persistence Fix
         public static final ModConfigSpec.BooleanValue ENABLE_ALLAY_PERSISTENCE_FIX;
 
+        // Silent Lightning Fix
+        public static final ModConfigSpec.BooleanValue ENABLE_SILENT_LIGHTNING_FIX;
+
         // Per-Chunk Entity Limiter
         public static final ModConfigSpec.BooleanValue ENABLE_PER_CHUNK_ENTITY_LIMIT;
         public static final ModConfigSpec.IntValue MAX_ENTITIES_PER_CHUNK;
@@ -194,6 +197,17 @@ public class SafetyConfig {
                                                 "Prevents Allay from despawning when holding items",
                                                 "아이템 수집 중인 Allay가 사라지는 문제를 해결합니다")
                                 .define("enableAllayPersistenceFix", true);
+
+                BUILDER.pop();
+
+                BUILDER.comment("Silent lightning fix")
+                                .push("silent_lightning");
+
+                ENABLE_SILENT_LIGHTNING_FIX = BUILDER
+                                .comment("번개가 Silent 태그를 가지고 있을 때 소리를 재생하지 않습니다",
+                                                "Prevents lightning from playing sound when it has the Silent tag",
+                                                "명령어로 조용한 번개를 소환할 때 유용합니다")
+                                .define("enableSilentLightningFix", true);
 
                 BUILDER.pop();
 

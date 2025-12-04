@@ -69,6 +69,10 @@ public class GameplayConfig {
         // Swim State Fix (MC-220390)
         public static final ModConfigSpec.BooleanValue ENABLE_SWIM_STATE_FIX;
 
+        // Potion Stacking System
+        public static final ModConfigSpec.BooleanValue ENABLE_POTION_STACKING;
+        public static final ModConfigSpec.IntValue POTION_STACK_SIZE;
+
         static {
                 BUILDER.comment("MCOPT Gameplay Improvements and Fixes Configuration")
                                 .push("gameplay");
@@ -296,6 +300,22 @@ public class GameplayConfig {
                                                 "해저 신전(Ocean Monument)에서 가디언과 싸울 때 특히 유용합니다",
                                                 "Fixes swim state desync when attacking entities while swimming (MC-220390)")
                                 .define("enableSwimStateFix", true);
+
+                BUILDER.pop();
+
+                BUILDER.comment("Potion and bottle stacking system")
+                                .push("potion_stacking");
+
+                ENABLE_POTION_STACKING = BUILDER
+                                .comment("물병과 포션을 겹칠 수 있게 하고, 양조기가 이를 지원하도록 수정합니다",
+                                                "Allows potions and bottles to stack and updates brewing stand logic",
+                                                "Potion Fixes 모드와 유사한 기능이지만 독자적으로 구현되었습니다")
+                                .define("enablePotionStacking", true);
+
+                POTION_STACK_SIZE = BUILDER
+                                .comment("포션/물병의 최대 스택 크기 (1-64)",
+                                                "Maximum stack size for potions and bottles")
+                                .defineInRange("potionStackSize", 16, 1, 64);
 
                 BUILDER.pop();
                 BUILDER.pop();
