@@ -42,6 +42,12 @@ public class SafetyConfig {
         // Potion Limit Fix
         public static final ModConfigSpec.BooleanValue ENABLE_POTION_LIMIT_FIX;
 
+        // Instant Wakeup Fix
+        public static final ModConfigSpec.BooleanValue ENABLE_INSTANT_WAKEUP;
+
+        // Allay Persistence Fix
+        public static final ModConfigSpec.BooleanValue ENABLE_ALLAY_PERSISTENCE_FIX;
+
         // Per-Chunk Entity Limiter
         public static final ModConfigSpec.BooleanValue ENABLE_PER_CHUNK_ENTITY_LIMIT;
         public static final ModConfigSpec.IntValue MAX_ENTITIES_PER_CHUNK;
@@ -166,6 +172,28 @@ public class SafetyConfig {
                                                 "예: Haste 128레벨이 역효과를 내거나, Levitation이 중력을 증가시키는 버그 방지",
                                                 "모드로 극한 포션 효과를 사용하는 경우 활성화 권장")
                                 .define("enablePotionLimitFix", true);
+
+                BUILDER.pop();
+
+                BUILDER.comment("Instant time sync when waking up from sleep")
+                                .push("instant_wakeup");
+
+                ENABLE_INSTANT_WAKEUP = BUILDER
+                                .comment("플레이어가 침대에서 일어날 때 시간 변경을 즉시 클라이언트에 동기화합니다",
+                                                "Instantly syncs time to clients when all players wake up from sleep",
+                                                "바닐라는 20틱마다 시간을 전송하므로 최대 1초 딜레이 발생")
+                                .define("enableInstantWakeup", true);
+
+                BUILDER.pop();
+
+                BUILDER.comment("Allay despawn prevention when holding items")
+                                .push("allay_fix");
+
+                ENABLE_ALLAY_PERSISTENCE_FIX = BUILDER
+                                .comment("Allay가 아이템을 들고 있을 때 디스폰되지 않도록 방지합니다",
+                                                "Prevents Allay from despawning when holding items",
+                                                "아이템 수집 중인 Allay가 사라지는 문제를 해결합니다")
+                                .define("enableAllayPersistenceFix", true);
 
                 BUILDER.pop();
 

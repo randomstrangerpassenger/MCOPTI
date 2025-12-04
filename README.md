@@ -179,6 +179,19 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **하위 호환성**: 기존 바닐라 byte 저장 방식과 호환되며, 확장된 레벨만 추가 태그로 저장
 - **모드팩 친화적**: 극한 포션 효과를 사용하는 모드팩에서 안정적으로 작동
 
+#### 즉시 기상 시간 동기화 (InstantWakeupFix) ⭐ NEW
+- **즉각적인 화면 전환**: 모든 플레이어가 침대에서 일어날 때 시간 변경을 즉시 클라이언트에 동기화
+- **딜레이 제거**: 바닐라는 20틱마다 시간 패킷을 전송하여 최대 1초 딜레이 발생, 이를 완전히 제거
+- **매끄러운 사용자 경험**: 밤→낮 전환이 즉시 화면에 반영되어 몰입감 향상
+- **서버 친화적**: 패킷 하나만 추가 전송하므로 네트워크 부하 최소화
+- **완전 독립 구현**: Instant Sky 모드에서 영감을 받았지만 MCOPT 자체 Mixin 패턴으로 구현
+
+#### Allay 영속성 보장 (AllayPersistenceFix) ⭐ NEW
+- **아이템 보유 시 디스폰 방지**: Allay가 손에 아이템을 들고 있을 때 디스폰되지 않도록 보장
+- **작업 중단 방지**: 플레이어가 아이템 수집을 지시한 Allay가 사라지는 문제 해결
+- **안정적인 아이템 수집**: 장거리 이동 중에도 Allay가 아이템을 안전하게 운반
+- **완전 독립 구현**: AllayFix 모드에서 영감을 받았지만 MCOPT 자체 Mixin 패턴으로 구현
+
 #### Entity AI Optimization ⭐ NEW
 - **Math Function Caching**: Pre-computed atan2, sin, cos lookup tables for AI calculations
 - **Optimized LookControl**: Replaces mob LookControl with cached math version
@@ -448,6 +461,24 @@ attributeMaxLimit = 1000000000
 # - 예: Haste 128레벨이 역효과를 내거나, Levitation이 중력을 증가시키는 버그 방지
 # - 모드로 극한 포션 효과를 사용하는 경우 활성화 권장
 enablePotionLimitFix = true
+```
+
+#### 즉시 기상 시간 동기화
+```toml
+[safety.instant_wakeup]
+# 플레이어가 침대에서 일어날 때 시간 변경을 즉시 클라이언트에 동기화합니다
+# Instantly syncs time to clients when all players wake up from sleep
+# 바닐라는 20틱마다 시간을 전송하므로 최대 1초 딜레이 발생
+enableInstantWakeup = true
+```
+
+#### Allay 영속성 보장
+```toml
+[safety.allay_fix]
+# Allay가 아이템을 들고 있을 때 디스폰되지 않도록 방지합니다
+# Prevents Allay from despawning when holding items
+# 아이템 수집 중인 Allay가 사라지는 문제를 해결합니다
+enableAllayPersistenceFix = true
 ```
 
 #### 청크 당 엔티티 제한
