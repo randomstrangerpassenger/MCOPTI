@@ -133,6 +133,13 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **모드팩 호환성**: 커스텀 월드 생성 모드와 함께 사용할 때 안정성 향상
 - **완전 독립 구현**: Lake Feature Fix 모드에서 영감을 받았지만 MCOPT 자체 구현
 
+#### Basin 생성 복원 (Basin Generation Fix 스타일) ⭐ NEW
+- **돌 디스크 피처 복원**: Plains, Forest, Savanna 등의 오버월드 바이옴에서 Basin (돌 디스크) 생성을 복원
+- **자연스러운 지형**: 바닐라 Minecraft에서 누락되었던 자연스러운 돌 지형 피처를 재추가
+- **설정 가능**: GameplayConfig에서 enableBasinFix로 쉽게 켜고 끌 수 있음
+- **BiomeModifier 기반**: NeoForge의 BiomeModifier 시스템을 사용한 깔끔한 구현
+- **완전 독립 구현**: Basin Generation Fix 모드에서 영감을 받았지만 MCOPT 자체 구현
+
 #### 버킷 미리보기 ⭐ NEW
 - **버킷 내용 툴팁**: 버킷에 담긴 액체나 생명체 정보를 툴팁에 표시해 이름만으로는 구분하기 어려운 경우를 해소
 - **희귀 변이 식별**: 열대어 패턴/색상 조합, 아홀로틀 변종 색상을 바로 보여 레어 물고기나 파란 아홀로틀을 놓치지 않음
@@ -484,6 +491,10 @@ loginTimeoutSeconds = 120
 # 커스텀 지형 생성 중 호수 기능으로 인한 크래시를 방지합니다
 # 로드되지 않은 청크의 바이옴을 확인할 때 발생하는 오류를 안전하게 처리합니다
 enableLakeCrashFix = true
+
+# 오버월드 바이옴에 돌 디스크(Basin) 피처를 복원합니다
+# Plains, Forest, Savanna 등의 바이옴에서 자연스러운 돌 지형 생성을 활성화합니다
+enableBasinFix = true
 ```
 
 #### Experience Orb Merging
@@ -850,6 +861,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   - **Fishing Rod Fix**: Fishing bobber cleanup patterns
   - **Redirected**: Portal redirect mechanism inspiration
   - **Lake Feature Fix**: Lake generation crash prevention patterns
+  - **Basin Generation Fix**: Basin (stone disk) feature restoration
 - All implementations are original and independent
 - Thanks to the NeoForge team for the excellent modding platform
 
