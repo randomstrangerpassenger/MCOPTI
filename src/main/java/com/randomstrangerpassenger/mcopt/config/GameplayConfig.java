@@ -52,6 +52,13 @@ public class GameplayConfig {
         // Damage Tilt Fix
         public static final ModConfigSpec.BooleanValue ENABLE_DAMAGE_TILT_FIX;
 
+        // Login Timeout Fix
+        public static final ModConfigSpec.BooleanValue ENABLE_LOGIN_TIMEOUT_FIX;
+        public static final ModConfigSpec.IntValue LOGIN_TIMEOUT_SECONDS;
+
+        // World Generation Fixes
+        public static final ModConfigSpec.BooleanValue ENABLE_LAKE_CRASH_FIX;
+
         static {
                 BUILDER.comment("MCOPT Gameplay Improvements and Fixes Configuration")
                                 .push("gameplay");
@@ -210,6 +217,35 @@ public class GameplayConfig {
                                                 "유효하지 않은 방향 정보(Yaw=0 또는 NaN)를 감지하고 올바른 방향으로 수정합니다",
                                                 "Fixes incorrect camera tilt direction when taking damage")
                                 .define("enableDamageTiltFix", true);
+
+                BUILDER.pop();
+
+                BUILDER.comment("Login timeout prevention for heavy modpacks")
+                                .push("login_timeout");
+
+                ENABLE_LOGIN_TIMEOUT_FIX = BUILDER
+                                .comment("무거운 모드팩에서 로그인 타임아웃을 방지합니다",
+                                                "클라이언트가 서버에 접속할 때 로딩 시간이 오래 걸려 튕기는 문제를 해결합니다",
+                                                "Prevents 'Timed Out' errors when joining servers with heavy modpacks")
+                                .define("enableLoginTimeoutFix", true);
+
+                LOGIN_TIMEOUT_SECONDS = BUILDER
+                                .comment("로그인 핸드셰이크 타임아웃 시간 (초)",
+                                                "바닐라 기본값: 30초",
+                                                "권장값: 120-180초 (무거운 모드팩의 경우)",
+                                                "Login handshake timeout in seconds (vanilla default: 30)")
+                                .defineInRange("loginTimeoutSeconds", 120, 30, 600);
+
+                BUILDER.pop();
+
+                BUILDER.comment("World generation crash fixes")
+                                .push("world_generation");
+
+                ENABLE_LAKE_CRASH_FIX = BUILDER
+                                .comment("커스텀 지형 생성 중 호수 기능으로 인한 크래시를 방지합니다",
+                                                "로드되지 않은 청크의 바이옴을 확인할 때 발생하는 오류를 안전하게 처리합니다",
+                                                "Prevents crashes caused by lake generation when checking biomes in unloaded chunks")
+                                .define("enableLakeCrashFix", true);
 
                 BUILDER.pop();
                 BUILDER.pop();

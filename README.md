@@ -31,6 +31,12 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **Behind-Wall Culling**: Optionally culls entities that are completely behind walls
 - **Smart Importance Detection**: Never culls important entities like vehicles or passengers
 
+#### Block Entity Rendering Optimization ⭐ NEW
+- **Distance-Based Block Entity Culling**: Skips rendering distant block entities (chests, signs, skulls)
+- **Behind-Wall Culling**: Optionally culls block entities that are behind walls
+- **Major FPS Boost in Storage Rooms**: Significant performance improvement in large warehouses
+- **Configurable Distance**: Adjust culling distance based on your render distance
+
 #### Dynamic FPS 컨트롤러 ⭐ NEW
 - **창 상태 기반 FPS 캡**: 플레이 화면, 메뉴, 비활성화, 최소화 상태마다 서로 다른 FPS 제한 적용
 - **원본 값 보존**: 사용자가 지정한 최대 FPS를 기억했다가 포커스를 되찾으면 즉시 복원
@@ -50,6 +56,13 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
   - 카메라와 파티클 사이에 불투명 블록이 있으면 렌더를 건너뜀
   - 기본 3프레임마다 시야 차단을 재검사해 과도한 레이캐스트를 방지
   - `particles.particleCullingRange`로 검사 거리, `particles.particleOcclusionCheckInterval`로 재검사 주기를 조절
+
+#### Smart Leaves Culling ⭐ NEW
+- **OptiLeaves 스타일 최적화**: 나무 안쪽의 보이지 않는 나뭇잎 면을 컬링하여 GPU 부담 감소
+- **숲 바이옴 FPS 향상**: 정글, 다크 오크 숲에서 10-40% 성능 향상
+- **시각적 품질 유지**: Fancy 그래픽 모드의 외형을 그대로 유지하면서 내부 면만 제거
+- **자동 호환성 보호**: cull-leaves, moreculling, optileaves, cull-less-leaves 모드 감지 시 자동 비활성화
+- **깊이 기반 컬링**: 설정 가능한 depth 값으로 나무가 투명해 보이는 것을 방지
 
 #### Snow Accumulation Optimization ⭐ NEW
 - **Simple Snowy Fix 스타일**: 눈 층이 늘어날 때 불필요한 이웃 알림을 줄여 눈보라 시 청크 리빌드 스파이크 감소
@@ -73,6 +86,13 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **경고 브로드캐스트**: 정리 직전에 알림을 보내 플레이어가 소지품을 회수할 시간을 제공
 - **화이트리스트/보호 옵션**: 이름표가 붙은 아이템이나 지정한 엔티티 ID는 건드리지 않도록 설정 가능
 - **온화한 기본값**: 기본적으로 꺼져 있으며, 필요할 때만 활성화하도록 설계
+
+#### 청크 당 엔티티 제한 (Per-Chunk Entity Limiter) ⭐ NEW
+- **국지적 렉 방지**: 특정 청크에 엔티티가 과도하게 밀집되는 것을 실시간으로 방지
+- **몹 타워 보호**: 몹 농장이나 자동화 시설에서 발생하는 국지적인 FPS 저하를 완화
+- **선택적 제한**: 몬스터, 동물, 아이템 등 엔티티 타입별로 제한 대상 설정 가능
+- **스폰 차단 또는 제거**: 청크가 꽉 찼을 때 새로운 스폰을 막거나 초과분을 제거하는 방식 선택 가능
+- **Clear Lag와 상호 보완**: Clear Lag는 전역 정리, 이 기능은 청크별 실시간 방어
 
 #### Iron Golem Spawn 안정화 ⭐ NEW
 - **Villager 소환 보정**: 마을 주민이 소환하는 철 골렘의 스폰 위치를 주변 지면으로 부드럽게 내림
@@ -100,15 +120,31 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **거리/청크 안전 검사**: 플레이어와 1024블록 이상 떨어지거나 언로드된 청크에 남은 낚싯찌를 감지해 줄을 정리
 - **완전 서버 사이드**: 로직을 건드리지 않고 참조만 정리해 다른 낚시 확장 모드와도 충돌 없이 동작
 
+#### 로그인 타임아웃 방지 (Login Timeout Fix) ⭐ NEW
+- **무거운 모드팩 지원**: 클라이언트가 서버에 접속할 때 로딩 시간이 오래 걸려 튕기는 문제 해결
+- **설정 가능한 타임아웃**: 바닐라 30초 대신 최대 600초(10분)까지 설정 가능
+- **권장 설정**: 무거운 모드팩의 경우 120-180초 권장
+- **"Timed Out" 에러 방지**: 모드팩이 많을수록 로딩 시간이 길어지는 문제를 근본적으로 해결
+
+#### 월드 생성 안정화 (Lake Crash Fix 스타일) ⭐ NEW
+- **호수 생성 크래시 방지**: 커스텀 지형 생성 중 호수 기능이 로드되지 않은 청크의 바이옴을 체크할 때 발생하는 크래시 방지
+- **청크 로드 확인**: 바이옴 체크 전에 해당 위치의 청크가 로드되어 있는지 안전하게 확인
+- **안전한 예외 처리**: 청크가 로드되지 않았거나 예외가 발생하면 안전한 기본값으로 처리
+- **모드팩 호환성**: 커스텀 월드 생성 모드와 함께 사용할 때 안정성 향상
+- **완전 독립 구현**: Lake Feature Fix 모드에서 영감을 받았지만 MCOPT 자체 구현
+
 #### 버킷 미리보기 ⭐ NEW
 - **버킷 내용 툴팁**: 버킷에 담긴 액체나 생명체 정보를 툴팁에 표시해 이름만으로는 구분하기 어려운 경우를 해소
 - **희귀 변이 식별**: 열대어 패턴/색상 조합, 아홀로틀 변종 색상을 바로 보여 레어 물고기나 파란 아홀로틀을 놓치지 않음
 - **완전 클라이언트 사이드**: 시각 정보만 추가하므로 서버 권한 없이도 안전하게 사용 가능, 다른 모드 버킷에도 대응
 
-#### 마법 부여 난수 리롤 ⭐ NEW
+#### 마법 부여 시드 동기화 강화 (Enchanter Fix 스타일) ⭐ NEW
 - **진짜 무작위화**: 테이블 슬롯(재료/라피스)이 바뀔 때마다 마법 부여 시드를 새로 뽑아 예측을 어렵게 만듭니다
+- **즉시 동기화**: 시드 변경 직후 `broadcastChanges()`를 호출하여 클라이언트가 항상 올바른 마법 부여 옵션을 표시하도록 보장
+- **바닐라 버그 수정**: 클라이언트에 오래된 마법 부여 옵션이 표시되는 바닐라 동기화 문제 해결
 - **간단한 설정 토글**: `fixEnchantmentRNG` 옵션으로 기존 바닐라식(플레이어 고정 시드)과 자유롭게 전환
-- **비침습적 구현**: UI/요구 레벨 등 원본 동작은 그대로 유지한 채 난수만 교체해 다른 모드와의 충돌을 최소화
+- **완전 독립 구현**: Enchanter Fix 모드의 문제 해결 방식에서 영감을 받았지만, MCOPT만의 독자적인 Mixin 패턴으로 구현
+- **비침습적 구현**: UI/요구 레벨 등 원본 동작은 그대로 유지한 채 난수와 동기화만 개선해 다른 모드와의 충돌을 최소화
 
 #### Dynamic Memory Management ⭐ NEW
 - **GC Spike Prevention**: Object pooling for Vec3 and BlockPos to reduce garbage collection pressure
@@ -134,6 +170,14 @@ MCOPT is a performance optimization mod for Minecraft designed to improve client
 - **상한 해제형 클램프**: 바닐라 1024 상한을 10억으로 확장해 대형 모드팩의 장비/스탯이 잘리지 않음
 - **보고 값 일치**: 속성의 최대치 조회 시에도 확장된 값이 반환되어 UI/호환 모드가 올바른 범위를 인식
 - **토글 가능**: 다른 모드가 고정 상한을 필요로 할 경우 설정에서 즉시 끌 수 있음
+
+#### 포션 레벨 제한 해제 (PotionLimitFix 스타일) ⭐ NEW
+- **Amplifier Byte Overflow 수정**: 포션 효과 레벨이 128 이상일 때 발생하는 byte overflow 버그 해결
+- **NBT 확장 저장**: 레벨 128 이상의 포션 효과를 int로 저장하여 음수 변환 방지
+- **바닐라 버그 해결**: Haste 128레벨이 블록 채굴을 불가능하게 만들거나, Levitation이 중력을 증가시키는 문제 수정
+- **레벨 표시 개선**: 10 초과 레벨을 로마 숫자 대신 아라비아 숫자로 표시 (예: "Speed II" → "Speed 11")
+- **하위 호환성**: 기존 바닐라 byte 저장 방식과 호환되며, 확장된 레벨만 추가 태그로 저장
+- **모드팩 친화적**: 극한 포션 효과를 사용하는 모드팩에서 안정적으로 작동
 
 #### Entity AI Optimization ⭐ NEW
 - **Math Function Caching**: Pre-computed atan2, sin, cos lookup tables for AI calculations
@@ -236,6 +280,17 @@ entityCullingDistance = 64
 cullEntitiesBehindWalls = true
 ```
 
+#### Block Entity Culling
+```toml
+[rendering.block_entity_culling]
+# Enable block entity culling optimizations (chests, signs, skulls, etc.)
+enableBlockEntityCulling = true
+# Distance at which block entities are culled (16-256 blocks, default: 64)
+blockEntityCullingDistance = 64
+# Skip rendering block entities behind walls
+cullBlockEntitiesBehindWalls = true
+```
+
 #### Particle System
 ```toml
 [general.particles]
@@ -245,6 +300,19 @@ enableParticleOptimizations = true
 maxParticlesPerFrame = 500
 # Reduce particle spawn rate (0.0-0.9, default: 0.25 = 25% reduction)
 particleSpawnReduction = 0.25
+```
+
+#### Smart Leaves Culling
+```toml
+[rendering.smart_leaves]
+# 나무 안쪽의 보이지 않는 나뭇잎 렌더링을 생략하여 숲 바이옴의 FPS를 높입니다
+enableSmartLeaves = true
+
+# 컬링을 적용할 최소 깊이 (0-5, 기본값: 2)
+# 0 = 가장 공격적인 컬링 (최고 성능, 약간의 시각적 변화 가능)
+# 2 = 권장 설정 (성능과 품질의 균형, Cull Less Leaves 스타일)
+# 높을수록 = 덜 공격적인 컬링 (나무가 속이 빈 것처럼 보이는 것을 방지)
+leavesCullingDepth = 2
 ```
 
 #### Weather & Snow
@@ -316,10 +384,14 @@ allowSneakBypass = true
 enableBucketPreview = true
 ```
 
-#### Enchanting
+#### Enchanting (Enchanter Fix 스타일)
 ```toml
 [general.enchanting]
-# 테이블 슬롯이 변할 때마다 마법 부여 시드를 새로 뽑아 예측을 어렵게 만듭니다
+# 테이블 슬롯이 변할 때마다 마법 부여 시드를 새로 뽑고 즉시 클라이언트에 동기화합니다
+# Enchanter Fix 모드와 유사한 기능이지만 MCOPT 자체 구현입니다
+# - 시드가 변경될 때마다 broadcastChanges()를 호출하여 클라이언트 동기화 보장
+# - 바닐라의 "오래된 마법 부여 옵션 표시" 버그를 수정
+# - 플레이어 고정 시드 대신 진정한 무작위 시드를 사용하여 예측을 어렵게 만듭니다
 fixEnchantmentRNG = true
 ```
 
@@ -366,6 +438,52 @@ enableMaxHealthStability = true
 enableAttributeRangeExpansion = true
 # 클램프 상한 (기본: 1,000,000,000)
 attributeMaxLimit = 1000000000
+```
+
+#### 포션 레벨 제한 해제
+```toml
+[safety.potion_fix]
+# 포션 효과 레벨(Amplifier)이 byte 범위(127)를 초과해도 정상 작동하도록 수정
+# - 바닐라는 내부적으로 int를 사용하지만 NBT 저장 시 byte로 변환되어 128+ 레벨에서 오버플로우 발생
+# - 예: Haste 128레벨이 역효과를 내거나, Levitation이 중력을 증가시키는 버그 방지
+# - 모드로 극한 포션 효과를 사용하는 경우 활성화 권장
+enablePotionLimitFix = true
+```
+
+#### 청크 당 엔티티 제한
+```toml
+[safety.per_chunk_entity_limit]
+# 특정 청크에 엔티티가 과도하게 밀집되는 것을 방지합니다
+enablePerChunkEntityLimit = false
+# 청크 당 최대 엔티티 수 (초과 시 오래된 엔티티부터 제거)
+maxEntitiesPerChunk = 50
+# 몬스터를 제한 대상에 포함
+limitMonsters = true
+# 동물을 제한 대상에 포함
+limitAnimals = true
+# 아이템 엔티티를 제한 대상에 포함
+limitItems = true
+# 청크가 꽉 찼을 때 새로운 스폰을 막습니다 (제거 대신 예방)
+preventSpawnWhenFull = false
+```
+
+#### 로그인 타임아웃 방지
+```toml
+[gameplay.login_timeout]
+# 무거운 모드팩에서 로그인 타임아웃을 방지합니다
+enableLoginTimeoutFix = true
+# 로그인 핸드셰이크 타임아웃 시간 (초)
+# 바닐라 기본값: 30초
+# 권장값: 120-180초 (무거운 모드팩의 경우)
+loginTimeoutSeconds = 120
+```
+
+#### 월드 생성 안정화
+```toml
+[gameplay.world_generation]
+# 커스텀 지형 생성 중 호수 기능으로 인한 크래시를 방지합니다
+# 로드되지 않은 청크의 바이옴을 확인할 때 발생하는 오류를 안전하게 처리합니다
+enableLakeCrashFix = true
 ```
 
 #### Experience Orb Merging
@@ -449,15 +567,17 @@ removeSquidFlee = false        # Squids won't flee from players
 For best performance in singleplayer:
 1. Enable all optimizations in the config
 2. Enable `enableEllipticalRenderDistance` for 10-35% FPS boost
-3. Enable `enableXpOrbMerging` to reduce lag during mob farming/mining
-4. Enable `enableObjectPooling` and `showMemoryHud` to monitor and reduce GC pressure
-5. Enable `enableAiOptimizations` for better performance with many mobs
-6. Use **F8 (Panic Button)** when experiencing sudden lag to free memory
-7. Set `chunkUpdateLimit` to 4-6 for smooth FPS
-8. Set `verticalRenderStretch` to 0.5-0.75 for better performance
-9. Set `entityCullingDistance` based on your render distance (32-64 for normal, 64-128 for high)
-10. Set `particleSpawnReduction` to 0.25-0.5 depending on your preferences
-11. For mob farms: Enable `removeStroll`, `removeRandomLookAround` for major performance gains
+3. Enable `enableSmartLeaves` for 10-40% FPS boost in forest biomes
+4. Enable `enableXpOrbMerging` to reduce lag during mob farming/mining
+5. Enable `enableObjectPooling` and `showMemoryHud` to monitor and reduce GC pressure
+6. Enable `enableAiOptimizations` for better performance with many mobs
+7. Use **F8 (Panic Button)** when experiencing sudden lag to free memory
+8. Set `chunkUpdateLimit` to 4-6 for smooth FPS
+9. Set `verticalRenderStretch` to 0.5-0.75 for better performance
+10. Set `entityCullingDistance` based on your render distance (32-64 for normal, 64-128 for high)
+11. Set `particleSpawnReduction` to 0.25-0.5 depending on your preferences
+12. For mob farms: Enable `removeStroll`, `removeRandomLookAround` for major performance gains
+13. For dense forests: Set `leavesCullingDepth` to 0 for maximum performance
 
 For high-end systems:
 - Increase `chunkUpdateLimit` to 10-15 for faster world updates
@@ -477,6 +597,7 @@ For low-end systems:
 - Set `xpOrbMergeRadius` to 2.5-5.0 for maximum orb reduction
 - Set `xpOrbMergeDelay` to 15-20 to reduce CPU overhead
 - Enable `aggressiveChunkCulling`
+- **Smart Leaves for low-end**: Set `leavesCullingDepth` to 0 for maximum forest performance
 - **AI Optimizations for low-end**: Enable `removeStroll`, `removeRandomLookAround`, `removeBreed` for passive mobs
 - For ocean biomes: Enable `removeSquidRandomMovement` and `removeFishSwim` for major gains
 
@@ -489,6 +610,63 @@ MCOPT adds the following key bindings (configurable in Minecraft's Controls menu
 | **F8** | Memory Panic Button | Triggers emergency memory cleanup (GC + pool clearing) with 5-second cooldown |
 
 The panic button provides instant feedback via chat message showing how much memory was freed.
+
+## Commands
+
+MCOPT provides diagnostic commands to help monitor and troubleshoot performance issues:
+
+### `/mcopt status` (or `/mcopt report`)
+
+Displays a comprehensive status report of MCOPT's current state:
+
+**Memory Usage:**
+- Current RAM usage and percentage
+- Color-coded warnings (green < 75%, yellow < 90%, red ≥ 90%)
+
+**Active Modules:**
+- Lists all enabled optimization features
+- Shows configuration values for key settings
+- Displays which features are currently running
+
+**Performance Statistics:**
+- Entity culling distance
+- Block entity culling distance
+- Per-chunk entity limits
+- Memory optimization status
+
+**Detected Conflicts:**
+- Identifies incompatible mods that are installed
+- Shows which MCOPT features were auto-disabled
+- Helps diagnose mod conflicts (e.g., Clumps, Dynamic FPS, AI Improvements)
+
+**Example Output:**
+```
+═══════════════════════════════════
+           MCOPT Status Report
+═══════════════════════════════════
+
+Memory Usage:
+  Used: 2048MB / 4096MB (50%)
+
+Active Modules:
+  Chunk Optimizations: ON
+  Entity Culling: ON
+  Block Entity Culling: ON
+  Particle Optimizations: ON
+  AI Optimizations: ON
+  Dynamic FPS: ON
+  Per-Chunk Entity Limit: OFF
+
+Configuration:
+  Entity Culling Distance: 64 blocks
+  Block Entity Culling Distance: 64 blocks
+  Memory Optimizations: Active
+
+No Conflicts Detected
+═══════════════════════════════════
+```
+
+**Permissions:** This command is available to all players in singleplayer and to operators on servers.
 
 ## Compatibility
 
@@ -515,6 +693,7 @@ If you experience issues with other mods, try:
 - AI-Improvements 설치 시: 엔티티 AI 최적화 자동 비활성화
 - Dynamic FPS/FPS Reducer 설치 시: 내장 동적 FPS 컨트롤러 자동 비활성화
 - AllTheLeaks/MemoryLeakFix 설치 시: Leak Guard 자동 비활성화
+- cull-leaves/moreculling/optileaves/cull-less-leaves 설치 시: Smart Leaves Culling 자동 비활성화
 
 ## Building from Source
 
@@ -654,10 +833,23 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Inspired by optimization strategies from:
+- Inspired by optimization strategies and bug fixes from:
   - **Sodium, Lithium, Embeddium**: Rendering and logic optimizations
   - **AI-Improvements**: Entity AI optimization concepts
   - **FerriteCore**: Memory optimization approaches
+  - **Enchanter Fix**: Enchantment seed synchronization fix approach
+  - **NeoBeeFix**: Bee pathfinding stability improvements
+  - **AllTheLeaks**: Memory leak detection patterns
+  - **AttributeFix**: Attribute range expansion concepts
+  - **PotionLevelFix**: Potion amplifier byte overflow fix concepts
+  - **dontDoThat**: Safety guard inspiration
+  - **Simple Snowy Fix**: Snow accumulation optimization
+  - **OptiLeaves**: Smart leaves culling techniques
+  - **Clumps**: Experience orb merging inspiration
+  - **Dynamic FPS / FPS Reducer**: FPS throttling concepts
+  - **Fishing Rod Fix**: Fishing bobber cleanup patterns
+  - **Redirected**: Portal redirect mechanism inspiration
+  - **Lake Feature Fix**: Lake generation crash prevention patterns
 - All implementations are original and independent
 - Thanks to the NeoForge team for the excellent modding platform
 
