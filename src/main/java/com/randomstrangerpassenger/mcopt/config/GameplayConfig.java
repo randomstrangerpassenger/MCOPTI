@@ -58,6 +58,7 @@ public class GameplayConfig {
 
         // World Generation Fixes
         public static final ModConfigSpec.BooleanValue ENABLE_LAKE_CRASH_FIX;
+        public static final ModConfigSpec.BooleanValue ENABLE_BASIN_FIX;
 
         static {
                 BUILDER.comment("MCOPT Gameplay Improvements and Fixes Configuration")
@@ -246,6 +247,12 @@ public class GameplayConfig {
                                                 "로드되지 않은 청크의 바이옴을 확인할 때 발생하는 오류를 안전하게 처리합니다",
                                                 "Prevents crashes caused by lake generation when checking biomes in unloaded chunks")
                                 .define("enableLakeCrashFix", true);
+
+                ENABLE_BASIN_FIX = BUILDER
+                                .comment("오버월드 바이옴에 돌 디스크(Basin) 피처를 복원합니다",
+                                                "Plains, Forest, Savanna 등의 바이옴에서 자연스러운 돌 지형 생성을 활성화합니다",
+                                                "Restores stone disk (Basin) generation in overworld biomes like Plains, Forest, and Savanna")
+                                .define("enableBasinFix", true);
 
                 BUILDER.pop();
                 BUILDER.pop();
