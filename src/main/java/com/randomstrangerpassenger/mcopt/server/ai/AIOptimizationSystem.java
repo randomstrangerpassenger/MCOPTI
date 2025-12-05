@@ -13,8 +13,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 
-import net.neoforged.neoforge.common.Tags;
-
 /**
  * Main system for AI optimization and goal management using Strategy pattern.
  * <p>
@@ -159,7 +157,9 @@ public class AIOptimizationSystem {
      */
     private static boolean shouldSkipOptimization(Mob mob) {
         // Always skip bosses unless explicitly enabled
-        if (mob instanceof EnderDragon || mob.getType().is(Tags.EntityTypes.BOSSES)) {
+        net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> bossesTag = java.util.Objects
+                .requireNonNull(net.neoforged.neoforge.common.Tags.EntityTypes.BOSSES, "BOSSES tag cannot be null");
+        if (mob instanceof EnderDragon || mob.getType().is(bossesTag)) {
             return true;
         }
 

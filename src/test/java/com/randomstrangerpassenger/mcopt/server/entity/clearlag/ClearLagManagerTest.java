@@ -138,13 +138,22 @@ class ClearLagManagerTest {
                     .as("ClearLagManager should have RemovalCategory enum")
                     .isTrue();
 
+            // Verify removalCategoryClass is not null before proceeding
+            assertThat(removalCategoryClass)
+                    .as("RemovalCategory class should not be null")
+                    .isNotNull();
+
+            // Use requireNonNull to satisfy static analysis after assertion
+            Class<?> validRemovalCategoryClass = java.util.Objects.requireNonNull(
+                    removalCategoryClass, "RemovalCategory class should not be null");
+
             // Verify it's an enum
-            assertThat(removalCategoryClass.isEnum())
+            assertThat(validRemovalCategoryClass.isEnum())
                     .as("RemovalCategory should be an enum")
                     .isTrue();
 
             // Verify expected enum constants exist
-            Object[] enumConstants = removalCategoryClass.getEnumConstants();
+            Object[] enumConstants = validRemovalCategoryClass.getEnumConstants();
             assertThat(enumConstants)
                     .as("RemovalCategory should have expected constants")
                     .hasSize(3);

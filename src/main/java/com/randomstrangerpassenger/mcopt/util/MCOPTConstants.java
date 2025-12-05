@@ -1,18 +1,49 @@
 package com.randomstrangerpassenger.mcopt.util;
 
 /**
- * Central location for commonly used constants in MCOPT.
- * Extracting these values improves maintainability and reduces magic numbers in
- * the codebase.
+ * Centralized constants for MCOPT.
+ * <p>
+ * This class consolidates all magic numbers, hardcoded strings, and common
+ * constants used throughout the codebase. This improves maintainability and
+ * reduces the chance of typos or inconsistencies.
+ * </p>
  */
 public final class MCOPTConstants {
 
         private MCOPTConstants() {
-                // Utility class - prevent instantiation
+                // Utility class - no instantiation
         }
 
         /**
-         * Minecraft world constants
+         * NBT tag keys used by MCOPT.
+         */
+        public static final class NBT {
+                private NBT() {
+                }
+
+                /**
+                 * Extended amplifier key for potion effects (int instead of byte).
+                 * Used to support amplifier values beyond 127.
+                 */
+                public static final String AMPLIFIER_INT = "mcopt:AmplifierInt";
+        }
+
+        /**
+         * Time-related constants (in ticks unless otherwise specified).
+         */
+        public static final class Time {
+                private Time() {
+                }
+
+                /** Ticks per second in Minecraft */
+                public static final int TICKS_PER_SECOND = 20;
+
+                /** Cooldown for displaying messages to prevent spam (2 seconds) */
+                public static final int MESSAGE_COOLDOWN_TICKS = 40;
+        }
+
+        /**
+         * Minecraft world constants.
          */
         public static final class Minecraft {
                 private Minecraft() {
@@ -28,14 +59,56 @@ public final class MCOPTConstants {
                 public static final double CHUNK_CENTER_OFFSET = 8.0;
 
                 /** Ticks per second in Minecraft (20 ticks = 1 second) */
-                public static final double TICKS_PER_SECOND = 20.0;
+                public static final double TICKS_PER_SECOND_DOUBLE = 20.0;
 
                 /** Distance threshold for entity back-face culling (in blocks squared) */
                 public static final double ENTITY_BACKFACE_CULLING_DISTANCE_SQ = 256.0; // 16 blocks squared
         }
 
         /**
-         * UI and rendering constants
+         * World and dimension constants.
+         */
+        public static final class World {
+                private World() {
+                }
+
+                /** Minimum build height in the Overworld */
+                public static final int OVERWORLD_MIN_HEIGHT = -64;
+
+                /** Maximum build height in the Overworld */
+                public static final int OVERWORLD_MAX_HEIGHT = 320;
+        }
+
+        /**
+         * Resource location and namespace constants.
+         */
+        public static final class Resources {
+                private Resources() {
+                }
+
+                /** MCOPT mod ID */
+                public static final String MOD_ID = "mcopt";
+
+                /** Minecraft namespace */
+                public static final String MINECRAFT = "minecraft";
+        }
+
+        /**
+         * Memory-related constants.
+         */
+        public static final class Memory {
+                private Memory() {
+                }
+
+                /** Bytes per megabyte */
+                public static final long BYTES_PER_MB = 1024L * 1024L;
+
+                /** Bytes per gigabyte */
+                public static final long BYTES_PER_GB = 1024L * 1024L * 1024L;
+        }
+
+        /**
+         * UI and rendering constants.
          */
         public static final class UI {
                 private UI() {
@@ -55,13 +128,10 @@ public final class MCOPTConstants {
 
                 /** Memory HUD update interval in milliseconds */
                 public static final long MEMORY_HUD_UPDATE_INTERVAL_MS = 1000L;
-
-                /** Bytes per megabyte conversion factor */
-                public static final long BYTES_PER_MB = 1024L * 1024L;
         }
 
         /**
-         * Performance and timing constants
+         * Performance and timing constants.
          */
         public static final class Performance {
                 private Performance() {
@@ -81,10 +151,19 @@ public final class MCOPTConstants {
 
                 /** Milliseconds per second */
                 public static final long MILLIS_PER_SECOND = 1000L;
+
+                /** Default render distance minimum */
+                public static final int MIN_RENDER_DISTANCE = 4;
+
+                /** Default render distance maximum */
+                public static final int MAX_RENDER_DISTANCE = 32;
+
+                /** Render distance reduction for idle state */
+                public static final int RENDER_DISTANCE_REDUCTION = 4;
         }
 
         /**
-         * Input constants
+         * Input constants.
          */
         public static final class Input {
                 private Input() {
@@ -95,7 +174,7 @@ public final class MCOPTConstants {
         }
 
         /**
-         * Fishing constants
+         * Fishing constants.
          */
         public static final class Fishing {
                 private Fishing() {

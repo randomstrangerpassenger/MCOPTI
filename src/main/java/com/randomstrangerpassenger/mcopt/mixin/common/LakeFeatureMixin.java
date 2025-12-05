@@ -3,12 +3,15 @@ package com.randomstrangerpassenger.mcopt.mixin.common;
 import com.randomstrangerpassenger.mcopt.config.GameplayConfig;
 import com.randomstrangerpassenger.mcopt.server.worldgen.WorldGenFixes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.feature.LakeFeature;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.Objects;
 
 /**
  * Prevents crashes during lake generation caused by checking biomes in unloaded
@@ -17,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * This fix intercepts biome freeze checks during lake feature generation and
  * ensures
  * that chunks are loaded before attempting to access biome data.
+ * </p>
  */
 @SuppressWarnings("deprecation") // LakeFeature is deprecated but we still need to mixin to it
 @Mixin(LakeFeature.class)
@@ -31,20 +35,13 @@ public abstract class LakeFeatureMixin {
      * If the chunk at that position isn't loaded, this can cause crashes. Our
      * redirect
      * ensures the chunk is loaded before checking the biome.
+     * </p>
      */
-    @Redirect(method = "place(Lnet/minecraft/world/level/levelgen/feature/FeaturePlaceContext;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/biome/Biome;shouldFreeze(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;)Z"), require = 0 // Don't
-                                                                                                                                                                                                                                                                                  // fail
-                                                                                                                                                                                                                                                                                  // if
-                                                                                                                                                                                                                                                                                  // the
-                                                                                                                                                                                                                                                                                  // method
-                                                                                                                                                                                                                                                                                  // signature
-                                                                                                                                                                                                                                                                                  // doesn't
-                                                                                                                                                                                                                                                                                  // match
-                                                                                                                                                                                                                                                                                  // (for
-                                                                                                                                                                                                                                                                                  // version
-                                                                                                                                                                                                                                                                                  // compatibility)
-    )
-    private boolean mcopt$safeBiomeFreezeCheck(Biome biome, net.minecraft.world.level.LevelReader level, BlockPos pos) {
+    @Redirect(method = "place(Lnet/minecraft/world/level/levelgen/feature/FeaturePlaceContext;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/biome/Biome;shouldFreeze(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;)Z"))
+    private boolean mcopt$safeBiomeFreezeCheck(Biome biome, LevelReader level, BlockPos pos) {
+        Objects.requireNonNull(level, "Level cannot be null");
+        Objects.requireNonNull(pos, "BlockPos cannot be null");
+
         if (!GameplayConfig.ENABLE_LAKE_CRASH_FIX.get()) {
             // If the fix is disabled, use vanilla behavior
             return biome.shouldFreeze(level, pos);
@@ -65,20 +62,13 @@ public abstract class LakeFeatureMixin {
      * loading first.
      * <p>
      * Similar to the freeze check, but for snow placement on lake edges.
+     * </p>
      */
-    @Redirect(method = "place(Lnet/minecraft/world/level/levelgen/feature/FeaturePlaceContext;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/biome/Biome;shouldSnow(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;)Z"), require = 0 // Don't
-                                                                                                                                                                                                                                                                                // fail
-                                                                                                                                                                                                                                                                                // if
-                                                                                                                                                                                                                                                                                // the
-                                                                                                                                                                                                                                                                                // method
-                                                                                                                                                                                                                                                                                // signature
-                                                                                                                                                                                                                                                                                // doesn't
-                                                                                                                                                                                                                                                                                // match
-                                                                                                                                                                                                                                                                                // (for
-                                                                                                                                                                                                                                                                                // version
-                                                                                                                                                                                                                                                                                // compatibility)
-    )
-    private boolean mcopt$safeBiomeSnowCheck(Biome biome, net.minecraft.world.level.LevelReader level, BlockPos pos) {
+    @Redirect(method = "place(Lnet/minecraft/world/level/levelgen/feature/FeaturePlaceContext;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/biome/Biome;shouldSnow(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;)Z"))
+    private boolean mcopt$safeBiomeSnowCheck(Biome biome, LevelReader level, BlockPos pos) {
+        Objects.requireNonNull(level, "Level cannot be null");
+        Objects.requireNonNull(pos, "BlockPos cannot be null");
+
         if (!GameplayConfig.ENABLE_LAKE_CRASH_FIX.get()) {
             // If the fix is disabled, use vanilla behavior
             return biome.shouldSnow(level, pos);

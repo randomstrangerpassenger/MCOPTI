@@ -7,12 +7,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.biome.Biome;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Objects;
 
 /**
  * Implements "Simple Snowy Fix" style snow layer stacking optimization.
@@ -40,15 +43,18 @@ public abstract class SnowLayerBlockMixin {
             return;
         }
 
-        int currentLayers = state.getValue(SnowLayerBlock.LAYERS);
+        IntegerProperty layersProperty = Objects.requireNonNull(
+                SnowLayerBlock.LAYERS, "LAYERS property cannot be null");
+        int currentLayers = state.getValue(layersProperty);
         if (currentLayers >= 8) {
             // Already at max height - no state change, skip update
             ci.cancel();
             return;
         }
 
-        BlockState currentState = level.getBlockState(pos);
-        BlockState newState = state.setValue(SnowLayerBlock.LAYERS, Math.min(8, currentLayers + 1));
+        BlockPos validPos = Objects.requireNonNull(pos, "BlockPos cannot be null");
+        BlockState currentState = level.getBlockState(validPos);
+        BlockState newState = state.setValue(layersProperty, Math.min(8, currentLayers + 1));
 
         // Snow layer count unchanged - no rebuild needed
         if (currentState.equals(newState)) {

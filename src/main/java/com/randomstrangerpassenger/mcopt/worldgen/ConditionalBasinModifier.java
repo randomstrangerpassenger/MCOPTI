@@ -11,15 +11,24 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.common.world.ModifiableBiomeInfo;
 
+import javax.annotation.Nonnull;
+import java.util.Objects;
+
 /**
- * BiomeModifier that conditionally adds basin (stone disk) features to biomes based on config.
+ * BiomeModifier that conditionally adds basin (stone disk) features to biomes
+ * based on config.
  * <p>
- * This modifier checks the {@link GameplayConfig#ENABLE_BASIN_FIX} setting at world generation time
- * and only adds the basin feature if enabled. This restores natural stone disk generation in
+ * This modifier checks the {@link GameplayConfig#ENABLE_BASIN_FIX} setting at
+ * world generation time
+ * and only adds the basin feature if enabled. This restores natural stone disk
+ * generation in
  * overworld biomes like Plains, Forest, and Savanna.
  * </p>
  *
- * <p>Implementation inspired by Basin Generation Fix mod, but completely independent.</p>
+ * <p>
+ * Implementation inspired by Basin Generation Fix mod, but completely
+ * independent.
+ * </p>
  */
 public record ConditionalBasinModifier(HolderSet<Biome> biomes, Holder<PlacedFeature> feature,
                 GenerationStep.Decoration step) implements BiomeModifier {
@@ -36,14 +45,16 @@ public record ConditionalBasinModifier(HolderSet<Biome> biomes, Holder<PlacedFea
                         .apply(instance, ConditionalBasinModifier::new));
 
         @Override
-        public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+        public void modify(@Nonnull Holder<Biome> biome, @Nonnull Phase phase,
+                        @Nonnull ModifiableBiomeInfo.BiomeInfo.Builder builder) {
                 // Only modify during ADD phase
                 if (phase != Phase.ADD) {
                         return;
                 }
 
                 // Check if this biome is in our target list
-                if (!biomes.contains(biome)) {
+                Holder<Biome> validBiome = Objects.requireNonNull(biome, "Biome holder cannot be null");
+                if (!biomes.contains(validBiome)) {
                         return;
                 }
 
@@ -52,8 +63,14 @@ public record ConditionalBasinModifier(HolderSet<Biome> biomes, Holder<PlacedFea
                         return;
                 }
 
+                // Ensure non-null feature holder
+                Holder<PlacedFeature> validFeature = Objects.requireNonNull(feature, "Feature cannot be null");
+
+                // Ensure non-null step
+                GenerationStep.Decoration validStep = Objects.requireNonNull(step, "Step cannot be null");
+
                 // Add the basin feature to the biome
-                builder.getGenerationSettings().addFeature(step, feature);
+                builder.getGenerationSettings().addFeature(validStep, validFeature);
         }
 
         @Override

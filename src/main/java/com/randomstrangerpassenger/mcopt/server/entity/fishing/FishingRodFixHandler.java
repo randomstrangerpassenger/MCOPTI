@@ -3,14 +3,18 @@ package com.randomstrangerpassenger.mcopt.server.entity.fishing;
 import com.randomstrangerpassenger.mcopt.MCOPT;
 import com.randomstrangerpassenger.mcopt.config.GameplayConfig;
 import com.randomstrangerpassenger.mcopt.util.MCOPTConstants;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+
+import java.util.Objects;
 
 /**
  * 안정적인 낚싯대 사용을 위해 플레이어와 낚싯찌의 상태를 주기적으로 점검합니다.
@@ -64,7 +68,8 @@ public final class FishingRodFixHandler {
         }
 
         // Hook in unloaded chunk becomes uncontrollable, so remove it safely
-        if (!hook.level().isLoaded(hook.blockPosition())) {
+        BlockPos hookPos = Objects.requireNonNull(hook.blockPosition(), "Hook position cannot be null");
+        if (!hook.level().isLoaded(hookPos)) {
             return true;
         }
 
@@ -76,7 +81,8 @@ public final class FishingRodFixHandler {
         ItemStack mainHand = player.getMainHandItem();
         ItemStack offHand = player.getOffhandItem();
 
-        return mainHand.is(Items.FISHING_ROD) || offHand.is(Items.FISHING_ROD);
+        Item fishingRod = Objects.requireNonNull(Items.FISHING_ROD, "Items.FISHING_ROD cannot be null");
+        return mainHand.is(fishingRod) || offHand.is(fishingRod);
     }
 
     private static void discardOrphanedHook(ServerPlayer player, FishingHook hook) {

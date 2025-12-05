@@ -3,6 +3,7 @@ package com.randomstrangerpassenger.mcopt.client.bucket;
 import com.randomstrangerpassenger.mcopt.MCOPT;
 import com.randomstrangerpassenger.mcopt.config.GameplayConfig;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
@@ -13,6 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MobBucketItem;
+import net.minecraft.world.item.component.CustomData;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -21,6 +23,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Adds lightweight bucket content previews in item tooltips.
@@ -84,7 +87,9 @@ public class BucketPreviewHandler {
     }
 
     private static void appendCustomName(ItemStack stack, ItemTooltipEvent event) {
-        Component customName = stack.get(DataComponents.CUSTOM_NAME);
+        DataComponentType<Component> componentType = Objects.requireNonNull(
+                DataComponents.CUSTOM_NAME, "CUSTOM_NAME component type cannot be null");
+        Component customName = stack.get(componentType);
         if (customName != null) {
             Component name = customName.copy().withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY);
             event.getToolTip().add(Component.translatable("tooltip.mcopt.bucket.custom_name", name));
@@ -92,9 +97,11 @@ public class BucketPreviewHandler {
     }
 
     private static void appendAxolotlVariant(ItemStack stack, ItemTooltipEvent event) {
-        net.minecraft.world.item.component.CustomData entityData = (net.minecraft.world.item.component.CustomData) stack
-                .getOrDefault(DataComponents.ENTITY_DATA,
-                        net.minecraft.world.item.component.CustomData.EMPTY);
+        @SuppressWarnings("unchecked")
+        DataComponentType<Object> entityDataType = (DataComponentType<Object>) (Object) Objects.requireNonNull(
+                DataComponents.ENTITY_DATA, "ENTITY_DATA component type cannot be null");
+        CustomData defaultData = Objects.requireNonNull(CustomData.EMPTY, "CustomData.EMPTY cannot be null");
+        CustomData entityData = (CustomData) stack.getOrDefault(entityDataType, defaultData);
         if (entityData.isEmpty()) {
             return;
         }
@@ -109,10 +116,13 @@ public class BucketPreviewHandler {
     }
 
     private static void appendTropicalFishVariant(ItemStack stack, ItemTooltipEvent event) {
-        net.minecraft.world.item.component.CustomData entityData = (net.minecraft.world.item.component.CustomData) stack
-                .getOrDefault(DataComponents.ENTITY_DATA,
-                        net.minecraft.world.item.component.CustomData.EMPTY);
-        if (entityData.isEmpty() || !stack.is(Items.TROPICAL_FISH_BUCKET)) {
+        @SuppressWarnings("unchecked")
+        DataComponentType<Object> entityDataType = (DataComponentType<Object>) (Object) Objects.requireNonNull(
+                DataComponents.ENTITY_DATA, "ENTITY_DATA component type cannot be null");
+        CustomData defaultData = Objects.requireNonNull(CustomData.EMPTY, "CustomData.EMPTY cannot be null");
+        CustomData entityData = (CustomData) stack.getOrDefault(entityDataType, defaultData);
+        Item item = Objects.requireNonNull(stack.getItem(), "Item cannot be null");
+        if (entityData.isEmpty() || !item.equals(Items.TROPICAL_FISH_BUCKET)) {
             return;
         }
 

@@ -59,8 +59,10 @@ public final class BeeFixHandler {
      * @param bee          The bee to clear the hive target for
      * @param timeoutTicks The timeout that triggered this clear (for logging)
      */
+    @SuppressWarnings("null") // setHivePos accepts @Nullable BlockPos - passing null is intentional
     private static void clearStuckHive(Bee bee, int timeoutTicks) {
         int cooldown = GameplayConfig.BEE_RELINK_COOLDOWN_TICKS.get();
+        // Clear the hive position by passing null
         bee.setHivePos(null);
         bee.setStayOutOfHiveCountdown(cooldown);
         MCOPT.LOGGER.debug(

@@ -1,11 +1,10 @@
 package com.randomstrangerpassenger.mcopt.client.rendering;
 
 import com.randomstrangerpassenger.mcopt.config.RenderingConfig;
-import com.randomstrangerpassenger.mcopt.util.MCOPTConstants;
-import net.minecraft.client.Camera;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
+
+import java.util.Objects;
 
 /**
  * Handles block entity culling logic for rendering optimization.
@@ -15,14 +14,18 @@ import org.joml.Vector3f;
  * - Are too far from the camera
  * - Are behind the camera
  * - Are behind walls (optional)
+ * </p>
  * <p>
- * Separates business logic from BlockEntityRenderDispatcherMixin to improve
- * testability and maintainability.
+ * Refactored to use {@link AbstractCullingHandler} to eliminate code
+ * duplication.
+ * </p>
  */
-public final class BlockEntityCullingHandler {
+public final class BlockEntityCullingHandler extends AbstractCullingHandler<BlockPos> {
+
+    private static final BlockEntityCullingHandler INSTANCE = new BlockEntityCullingHandler();
 
     private BlockEntityCullingHandler() {
-        // Utility class
+        // Singleton
     }
 
     /**
@@ -36,37 +39,26 @@ public final class BlockEntityCullingHandler {
      */
     public static boolean shouldCullBlockEntity(
             BlockPos blockPos,
-            Camera camera,
+            net.minecraft.client.Camera camera,
             int cullingDistance) {
-
-        if (!RenderingConfig.ENABLE_BLOCK_ENTITY_CULLING.get()) {
-            return false;
-        }
-
-        Vec3 cameraPos = camera.getPosition();
-        Vec3 blockEntityPos = Vec3.atCenterOf(blockPos);
-
-        // Distance culling
-        double distanceSquared = cameraPos.distanceToSqr(blockEntityPos);
-        double maxDistanceSquared = cullingDistance * cullingDistance;
-
-        if (distanceSquared > maxDistanceSquared) {
-            return true; // Cull
-        }
-
-        // Backface culling (block entities behind camera)
-        if (RenderingConfig.CULL_BLOCK_ENTITIES_BEHIND_WALLS.get()) {
-            Vector3f look = camera.getLookVector();
-            Vec3 viewVector = new Vec3(look.x(), look.y(), look.z());
-            Vec3 toBlockEntity = blockEntityPos.subtract(cameraPos).normalize();
-
-            double dotProduct = viewVector.dot(toBlockEntity);
-            if (dotProduct < MCOPTConstants.Performance.BACKFACE_CULLING_DOT_THRESHOLD
-                    && distanceSquared > MCOPTConstants.Minecraft.ENTITY_BACKFACE_CULLING_DISTANCE_SQ) {
-                return true; // Cull
-            }
-        }
-
-        return false; // Don't cull
+        return INSTANCE.shouldCull(blockPos, camera, cullingDistance);
     }
+
+    @Override
+    public Vec3 getPosition(BlockPos blockPos) {
+        BlockPos validPos = Objects.requireNonNull(blockPos, "BlockPos cannot be null");
+        return Vec3.atCenterOf(validPos);
+    }
+
+    @Override
+    public boolean supportsBackfaceCulling() {
+        return RenderingConfig.CULL_BLOCK_ENTITIES_BEHIND_WALLS.get();
+    }
+
+    @Override
+    protected boolean isEnabled() {
+        return RenderingConfig.ENABLE_BLOCK_ENTITY_CULLING.get();
+    }
+
+    // Block entities have no special exemptions, use default implementation
 }

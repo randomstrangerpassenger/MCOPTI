@@ -1,22 +1,22 @@
 package com.randomstrangerpassenger.mcopt.client.rendering;
 
 import com.randomstrangerpassenger.mcopt.config.RenderingConfig;
-import com.randomstrangerpassenger.mcopt.util.MCOPTConstants;
-import net.minecraft.client.Camera;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 /**
  * Handles entity culling logic for rendering optimization.
  * <p>
- * Separates business logic from EntityRenderDispatcherMixin to improve
- * testability and maintainability.
+ * Refactored to use {@link AbstractCullingHandler} to eliminate code
+ * duplication.
+ * </p>
  */
-public final class EntityCullingHandler {
+public final class EntityCullingHandler extends AbstractCullingHandler<Entity> {
+
+    private static final EntityCullingHandler INSTANCE = new EntityCullingHandler();
 
     private EntityCullingHandler() {
-        // Utility class
+        // Singleton
     }
 
     /**
@@ -29,40 +29,29 @@ public final class EntityCullingHandler {
      */
     public static boolean shouldCullEntity(
             Entity entity,
-            Camera camera,
+            net.minecraft.client.Camera camera,
             int cullingDistance) {
+        return INSTANCE.shouldCull(entity, camera, cullingDistance);
+    }
 
-        if (!RenderingConfig.ENABLE_ENTITY_CULLING.get()) {
-            return false;
-        }
+    @Override
+    public Vec3 getPosition(Entity entity) {
+        return entity.position();
+    }
 
-        Vec3 cameraPos = camera.getPosition();
-        Vec3 entityPos = entity.position();
+    @Override
+    public boolean supportsBackfaceCulling() {
+        return RenderingConfig.CULL_ENTITIES_BEHIND_WALLS.get();
+    }
 
-        // Distance culling
-        double distanceSquared = cameraPos.distanceToSqr(entityPos);
-        double maxDistanceSquared = cullingDistance * cullingDistance;
+    @Override
+    protected boolean isEnabled() {
+        return RenderingConfig.ENABLE_ENTITY_CULLING.get();
+    }
 
-        if (distanceSquared > maxDistanceSquared) {
-            // Don't cull players or vehicles the player is in
-            if (!entity.isVehicle() && !entity.isPassenger()) {
-                return true; // Cull
-            }
-        }
-
-        // Backface culling (entities behind camera)
-        if (RenderingConfig.CULL_ENTITIES_BEHIND_WALLS.get()) {
-            Vector3f look = camera.getLookVector();
-            Vec3 viewVector = new Vec3(look.x(), look.y(), look.z());
-            Vec3 toEntity = entityPos.subtract(cameraPos).normalize();
-
-            double dotProduct = viewVector.dot(toEntity);
-            if (dotProduct < MCOPTConstants.Performance.BACKFACE_CULLING_DOT_THRESHOLD
-                    && distanceSquared > MCOPTConstants.Minecraft.ENTITY_BACKFACE_CULLING_DISTANCE_SQ) {
-                return true; // Cull
-            }
-        }
-
-        return false; // Don't cull
+    @Override
+    public boolean hasSpecialCullingExemption(Entity entity, double distanceSquared) {
+        // Don't cull players or vehicles the player is in
+        return entity.isVehicle() || entity.isPassenger();
     }
 }

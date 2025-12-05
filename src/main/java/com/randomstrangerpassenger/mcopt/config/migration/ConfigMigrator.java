@@ -9,12 +9,29 @@ import java.util.*;
  * Orchestrates configuration migrations from old versions to current version.
  * <p>
  * Migration process:
+ * package com.randomstrangerpassenger.mcopt.config.migration;
+ * 
+ * import com.electronwill.nightconfig.core.CommentedConfig;
+ * import com.randomstrangerpassenger.mcopt.MCOPT;
+ * 
+ * import java.util.*;
+ * 
+ * /**
+ * Orchestrates configuration migrations from old versions to current version.
+ * <p>
+ * Migration process:
  * 1. Read config version from file
  * 2. If version is missing or older than current, apply migrations
  * 3. Migrations are applied sequentially in version order
  * 4. Update version field to current after successful migration
  * <p>
  * Thread-safe: Migrations are synchronized to prevent concurrent modifications.
+ * <p>
+ * Refactored to use separate components for better organization:
+ * <ul>
+ * <li>{@link MigrationValidator} - Validates migration chain integrity</li>
+ * <li>{@link MigrationChainBuilder} - Builds migration chains</li>
+ * </ul>
  */
 public class ConfigMigrator {
 
@@ -28,6 +45,10 @@ public class ConfigMigrator {
      */
     private static final List<ConfigMigration> MIGRATIONS = new ArrayList<>();
 
+    // Component instances
+    private static final MigrationValidator validator = new MigrationValidator();
+    private static MigrationChainBuilder chainBuilder;
+
     static {
         // Register migrations here in chronological order
         // Example:
@@ -37,37 +58,11 @@ public class ConfigMigrator {
         // Sort migrations by source version to ensure correct order
         MIGRATIONS.sort(Comparator.comparing(ConfigMigration::fromVersion));
 
+        // Initialize chain builder
+        chainBuilder = new MigrationChainBuilder(MIGRATIONS);
+
         // Validate migration chain integrity
-        validateMigrationChain();
-    }
-
-    /**
-     * Validate that migrations form a continuous chain without gaps.
-     *
-     * @throws IllegalStateException if migration chain is invalid
-     */
-    private static void validateMigrationChain() {
-        if (MIGRATIONS.isEmpty()) {
-            return; // No migrations registered yet
-        }
-
-        ConfigVersion expectedVersion = MIGRATIONS.get(0).fromVersion();
-
-        for (ConfigMigration migration : MIGRATIONS) {
-            if (!migration.fromVersion().equals(expectedVersion)) {
-                throw new IllegalStateException(
-                        String.format("Migration chain gap: expected migration from %s, found %s",
-                                expectedVersion, migration.fromVersion()));
-            }
-            expectedVersion = migration.toVersion();
-        }
-
-        // Verify chain ends at current version
-        if (!expectedVersion.equals(ConfigVersion.CURRENT)) {
-            MCOPT.LOGGER.warn("Migration chain ends at {} but current version is {}. " +
-                            "This may indicate missing migrations.",
-                    expectedVersion, ConfigVersion.CURRENT);
-        }
+        validator.validateChain(MIGRATIONS);
     }
 
     /**
@@ -95,8 +90,8 @@ public class ConfigMigrator {
         MCOPT.LOGGER.info("Migrating config from {} to {}",
                 currentVersion, ConfigVersion.CURRENT);
 
-        // Apply migrations sequentially
-        List<ConfigMigration> applicableMigrations = getApplicableMigrations(currentVersion);
+        // Build migration chain using component
+        List<ConfigMigration> applicableMigrations = chainBuilder.buildChain(currentVersion);
 
         if (applicableMigrations.isEmpty()) {
             MCOPT.LOGGER.warn("Config version {} is older than current {}, but no migrations found",
@@ -165,34 +160,13 @@ public class ConfigMigrator {
     /**
      * Set the version field in a configuration.
      *
-     * @param config Configuration to update
+     * @param config  Configuration to update
      * @param version Version to set
      */
     public static void setConfigVersion(CommentedConfig config, ConfigVersion version) {
         config.set(VERSION_KEY, version.toString());
         config.setComment(VERSION_KEY,
                 "Configuration version for migration tracking (DO NOT MODIFY)");
-    }
-
-    /**
-     * Get list of migrations that should be applied to upgrade from given version.
-     *
-     * @param fromVersion Starting version
-     * @return List of migrations to apply, in order
-     */
-    private static List<ConfigMigration> getApplicableMigrations(ConfigVersion fromVersion) {
-        List<ConfigMigration> applicable = new ArrayList<>();
-
-        for (ConfigMigration migration : MIGRATIONS) {
-            // Include migration if its source version >= our current version
-            // and its source version < target version
-            if (migration.fromVersion().compareTo(fromVersion) >= 0
-                    && migration.fromVersion().isOlderThan(ConfigVersion.CURRENT)) {
-                applicable.add(migration);
-            }
-        }
-
-        return applicable;
     }
 
     /**
@@ -214,5 +188,25 @@ public class ConfigMigrator {
      */
     public static List<ConfigMigration> getRegisteredMigrations() {
         return Collections.unmodifiableList(MIGRATIONS);
+    }
+
+    /**
+     * Get the migration validator component.
+     * For testing purposes.
+     *
+     * @return the migration validator
+     */
+    public static MigrationValidator getValidator() {
+        return validator;
+    }
+
+    /**
+     * Get the migration chain builder component.
+     * For testing purposes.
+     *
+     * @return the chain builder
+     */
+    public static MigrationChainBuilder getChainBuilder() {
+        return chainBuilder;
     }
 }

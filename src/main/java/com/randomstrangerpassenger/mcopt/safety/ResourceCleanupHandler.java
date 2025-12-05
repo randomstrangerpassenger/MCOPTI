@@ -8,6 +8,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handles aggressive resource cleanup on world unload and disconnect events.
@@ -15,6 +17,8 @@ import net.neoforged.neoforge.event.level.LevelEvent;
  */
 @EventBusSubscriber(modid = MCOPT.MOD_ID, value = Dist.CLIENT)
 public class ResourceCleanupHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceCleanupHandler.class);
 
     /**
      * Clean up resources when logging out from a server/world.
@@ -25,7 +29,7 @@ public class ResourceCleanupHandler {
             return;
         }
 
-        MCOPT.LOGGER.info("Client logging out - performing memory cleanup");
+        LOGGER.info("Client logging out - performing memory cleanup");
         performCleanup();
     }
 
@@ -43,7 +47,7 @@ public class ResourceCleanupHandler {
             return;
         }
 
-        MCOPT.LOGGER.info("Level unloading - performing memory cleanup");
+        LOGGER.info("Level unloading - performing memory cleanup");
         performCleanup();
     }
 
@@ -56,33 +60,23 @@ public class ResourceCleanupHandler {
 
             // Clear particle engine cache
             if (minecraft.particleEngine != null) {
-                // The particle engine manages its own cleanup, but we can trigger it
-                MCOPT.LOGGER.debug("Particle engine cleanup triggered");
+                LOGGER.debug("Particle engine cleanup triggered");
             }
 
             // Clear texture manager unused textures
             if (minecraft.getTextureManager() != null) {
-                // Note: Be careful not to clear actively used textures
-                // The texture manager handles its own lifecycle
-                MCOPT.LOGGER.debug("Texture manager state checked");
+                LOGGER.debug("Texture manager state checked");
             }
 
             // Clear render chunk cache if available
             if (minecraft.levelRenderer != null) {
-                // The level renderer manages compiled chunks
-                // We don't want to be too aggressive here as it can cause visual issues
-                MCOPT.LOGGER.debug("Level renderer state checked");
+                LOGGER.debug("Level renderer state checked");
             }
 
-            // Note: We no longer force garbage collection here as it can cause lag spikes.
-            // Modern JVM garbage collectors (especially in Java 21) are efficient enough
-            // to handle memory cleanup automatically. Manual GC is only available via
-            // the panic button (F8) for emergency debugging purposes.
-
-            MCOPT.LOGGER.info("Memory cleanup completed successfully");
+            LOGGER.info("Memory cleanup completed successfully");
 
         } catch (Exception e) {
-            MCOPT.LOGGER.error("Error during memory cleanup", e);
+            LOGGER.error("Error during memory cleanup", e);
         }
     }
 }

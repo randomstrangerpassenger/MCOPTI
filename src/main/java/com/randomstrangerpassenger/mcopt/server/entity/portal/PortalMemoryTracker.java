@@ -1,6 +1,7 @@
 package com.randomstrangerpassenger.mcopt.server.entity.portal;
 
 import com.randomstrangerpassenger.mcopt.MCOPT;
+import com.randomstrangerpassenger.mcopt.util.MCOPTConstants;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -10,12 +11,20 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.NetherPortalBlock;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * Stores the player's last used nether portal per dimension and redirects
- * future arrivals
- * to that remembered location to prevent unwanted portal swapping.
+ * future arrivals to that remembered location to prevent unwanted portal
+ * swapping.
+ * <p>
+ * Refactored to use separate components:
+ * <ul>
+ * <li>{@link NbtHelper} - Safe NBT data access</li>
+ * <li>{@link PortalMemory} - Immutable portal data record</li>
+ * </ul>
+ * </p>
  */
 public final class PortalMemoryTracker {
     private static final String TAG_PORTAL_MEMORY = "portal_memory";
@@ -23,8 +32,15 @@ public final class PortalMemoryTracker {
     private static final String TAG_YAW = "yaw";
 
     private PortalMemoryTracker() {
+        // Utility class
     }
 
+    /**
+     * Remember a portal location for the player.
+     *
+     * @param player    the player
+     * @param portalPos the portal position to remember
+     */
     public static void rememberPortal(ServerPlayer player, BlockPos portalPos) {
         // Validate portal position before storing
         if (!isValidPosition(portalPos)) {
@@ -33,18 +49,14 @@ public final class PortalMemoryTracker {
         }
 
         try {
-            CompoundTag mcoptData = ensureMcoptData(player);
-            CompoundTag memory;
-            if (mcoptData.contains(TAG_PORTAL_MEMORY)) {
-                memory = getCompoundOrNew(mcoptData, TAG_PORTAL_MEMORY);
-            } else {
-                memory = new CompoundTag();
-            }
+            CompoundTag mcoptData = NbtHelper.ensureCompound(player.getPersistentData(), MCOPT.MOD_ID);
+            CompoundTag memory = NbtHelper.ensureCompound(mcoptData, TAG_PORTAL_MEMORY);
 
-            String dimensionKey = player.level().dimension().location().toString();
+            String dimensionKey = Objects.requireNonNull(
+                    player.level().dimension().location().toString(), "Dimension key cannot be null");
 
+            // Store portal data
             CompoundTag portalTag = new CompoundTag();
-            // Store BlockPos as individual int values
             CompoundTag posTag = new CompoundTag();
             posTag.putInt("X", portalPos.getX());
             posTag.putInt("Y", portalPos.getY());
@@ -53,7 +65,6 @@ public final class PortalMemoryTracker {
             portalTag.putFloat(TAG_YAW, player.getYRot());
 
             memory.put(dimensionKey, portalTag);
-            mcoptData.put(TAG_PORTAL_MEMORY, memory);
 
             MCOPT.LOGGER.debug("Remembered portal at {} for player {} in dimension {}",
                     portalPos, player.getName().getString(), dimensionKey);
@@ -62,13 +73,22 @@ public final class PortalMemoryTracker {
         }
     }
 
+    /**
+     * Redirect a player to their remembered portal in the destination dimension.
+     *
+     * @param player      the player to redirect
+     * @param destination the destination dimension
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked", "null" })
     public static void redirectToRememberedPortal(ServerPlayer player, ResourceKey<Level> destination) {
         Optional<PortalMemory> memory = getPortalMemory(player, destination);
         if (memory.isEmpty()) {
             return;
         }
 
-        ServerLevel level = player.level().getServer() != null ? player.level().getServer().getLevel(destination)
+        ResourceKey<Level> validDestination = Objects.requireNonNull(destination, "Destination cannot be null");
+        ServerLevel level = player.level().getServer() != null
+                ? player.level().getServer().getLevel(validDestination)
                 : null;
         if (level == null) {
             MCOPT.LOGGER.warn("Failed to get destination level for portal redirect: {}", destination.location());
@@ -76,7 +96,7 @@ public final class PortalMemoryTracker {
         }
 
         PortalMemory portalMemory = memory.get();
-        BlockPos portalPos = portalMemory.pos();
+        BlockPos portalPos = Objects.requireNonNull(portalMemory.pos(), "Portal position cannot be null");
 
         // Validate portal position is within world bounds
         if (!isValidPosition(portalPos)) {
@@ -91,14 +111,28 @@ public final class PortalMemoryTracker {
         }
 
         // Teleport player to remembered portal
-        // NeoForge 1.21: teleportTo signature changed
-        // ServerPlayer.teleportTo(ServerLevel, double, double, double, Set<Relative>,
-        // float, float, boolean)
-        player.teleportTo(level, portalPos.getX() + 0.5, portalPos.getY(), portalPos.getZ() + 0.5,
-                java.util.Collections.emptySet(), portalMemory.yaw(), player.getXRot(), false);
-        MCOPT.LOGGER.info("Redirected player {} to remembered portal at {}", player.getName().getString(), portalPos);
+        java.util.Set emptyRelatives = java.util.Collections.emptySet();
+        player.teleportTo(
+                level,
+                portalPos.getX() + 0.5,
+                (double) portalPos.getY(),
+                portalPos.getZ() + 0.5,
+                emptyRelatives,
+                portalMemory.yaw(),
+                player.getXRot(),
+                false);
+
+        MCOPT.LOGGER.info("Redirected player {} to remembered portal at {}",
+                player.getName().getString(), portalPos);
     }
 
+    /**
+     * Get the remembered portal for a player in a specific dimension.
+     *
+     * @param player    the player
+     * @param dimension the dimension key
+     * @return optional portal memory, empty if not found
+     */
     private static Optional<PortalMemory> getPortalMemory(ServerPlayer player, ResourceKey<Level> dimension) {
         try {
             CompoundTag data = player.getPersistentData();
@@ -106,29 +140,28 @@ public final class PortalMemoryTracker {
                 return Optional.empty();
             }
 
-            CompoundTag mcoptData = getCompoundOrNew(data, MCOPT.MOD_ID);
-
+            CompoundTag mcoptData = NbtHelper.getCompoundOrNew(data, MCOPT.MOD_ID);
             if (!mcoptData.contains(TAG_PORTAL_MEMORY)) {
                 return Optional.empty();
             }
 
-            CompoundTag memory = getCompoundOrNew(mcoptData, TAG_PORTAL_MEMORY);
+            CompoundTag memory = NbtHelper.getCompoundOrNew(mcoptData, TAG_PORTAL_MEMORY);
 
-            String dimensionKey = dimension.location().toString();
-
+            String dimensionKey = Objects.requireNonNull(
+                    dimension.location().toString(), "Dimension key cannot be null");
             if (!memory.contains(dimensionKey)) {
                 return Optional.empty();
             }
 
-            CompoundTag portalTag = getCompoundOrNew(memory, dimensionKey);
-            CompoundTag posTag = getCompoundOrNew(portalTag, TAG_POSITION);
+            CompoundTag portalTag = NbtHelper.getCompoundOrNew(memory, dimensionKey);
+            CompoundTag posTag = NbtHelper.getCompoundOrNew(portalTag, TAG_POSITION);
 
-            int x = getIntOrZero(posTag, "X");
-            int y = getIntOrZero(posTag, "Y");
-            int z = getIntOrZero(posTag, "Z");
+            int x = NbtHelper.getIntOrZero(posTag, "X");
+            int y = NbtHelper.getIntOrZero(posTag, "Y");
+            int z = NbtHelper.getIntOrZero(posTag, "Z");
             BlockPos pos = new BlockPos(x, y, z);
 
-            float yaw = getFloatOrZero(portalTag, TAG_YAW);
+            float yaw = NbtHelper.getFloatOrZero(portalTag, TAG_YAW);
 
             return Optional.of(new PortalMemory(pos, yaw));
         } catch (Exception e) {
@@ -137,71 +170,23 @@ public final class PortalMemoryTracker {
         }
     }
 
-    private static CompoundTag ensureMcoptData(ServerPlayer player) {
-        CompoundTag data = player.getPersistentData();
-        if (!data.contains(MCOPT.MOD_ID)) {
-            data.put(MCOPT.MOD_ID, new CompoundTag());
-        }
-        return getCompoundOrNew(data, MCOPT.MOD_ID);
-    }
-
-    // Helper methods to handle potential Optional returns from NBT getters
-    @SuppressWarnings("unchecked")
-    private static CompoundTag getCompoundOrNew(CompoundTag tag, String key) {
-        try {
-            Object result = tag.getCompound(key);
-            if (result instanceof Optional) {
-                return ((Optional<CompoundTag>) result).orElse(new CompoundTag());
-            } else if (result instanceof CompoundTag) {
-                return (CompoundTag) result;
-            } else {
-                return new CompoundTag();
-            }
-        } catch (Exception e) {
-            return new CompoundTag();
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static int getIntOrZero(CompoundTag tag, String key) {
-        try {
-            Object result = tag.getInt(key);
-            if (result instanceof Optional) {
-                return ((Optional<Integer>) result).orElse(0);
-            } else if (result instanceof Integer) {
-                return (Integer) result;
-            } else {
-                return 0;
-            }
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static float getFloatOrZero(CompoundTag tag, String key) {
-        try {
-            Object result = tag.getFloat(key);
-            if (result instanceof Optional) {
-                return ((Optional<Float>) result).orElse(0.0f);
-            } else if (result instanceof Float) {
-                return (Float) result;
-            } else {
-                return 0.0f;
-            }
-        } catch (Exception e) {
-            return 0.0f;
-        }
-    }
-
+    /**
+     * Validate that a position is within reasonable world bounds.
+     *
+     * @param pos the position to validate
+     * @return true if valid
+     */
     private static boolean isValidPosition(BlockPos pos) {
-        return pos != null &&
-                pos.getY() >= -64 && // Minimum Y for 1.18+
-                pos.getY() <= 320 && // Maximum Y for 1.18+
-                Math.abs(pos.getX()) < 30000000 &&
-                Math.abs(pos.getZ()) < 30000000;
+        return pos != null
+                && pos.getY() >= MCOPTConstants.World.OVERWORLD_MIN_HEIGHT
+                && pos.getY() <= MCOPTConstants.World.OVERWORLD_MAX_HEIGHT
+                && Math.abs(pos.getX()) < 30000000
+                && Math.abs(pos.getZ()) < 30000000;
     }
 
+    /**
+     * Immutable record holding portal location and orientation.
+     */
     private record PortalMemory(BlockPos pos, float yaw) {
     }
 }

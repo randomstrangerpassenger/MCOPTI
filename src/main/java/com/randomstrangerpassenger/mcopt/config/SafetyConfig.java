@@ -124,7 +124,10 @@ public class SafetyConfig {
 
                 CLEAR_LAG_ENTITY_WHITELIST = BUILDER
                                 .comment("제거 대상에서 제외할 엔티티 ID 목록 (예: minecraft:armor_stand)")
-                                .define("clearLagEntityWhitelist", List.of(), entry -> entry instanceof String);
+                                .define("clearLagEntityWhitelist",
+                                                java.util.Objects.requireNonNull(List.of(),
+                                                                "Default list cannot be null"),
+                                                entry -> entry instanceof String);
 
                 BUILDER.pop();
 

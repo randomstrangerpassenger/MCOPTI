@@ -1,11 +1,15 @@
 package com.randomstrangerpassenger.mcopt.fixes;
 
 import com.randomstrangerpassenger.mcopt.config.GameplayConfig;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
+
+import java.util.Objects;
 
 /**
  * ItemStack Data Component sanitizer utility.
@@ -38,9 +42,11 @@ public class ItemDataSanitizer {
             return false;
         }
 
-        CustomData customData = stack.get(DataComponents.CUSTOM_DATA);
+        DataComponentType<CustomData> customDataType = Objects.requireNonNull(
+                DataComponents.CUSTOM_DATA, "CUSTOM_DATA component type cannot be null");
+        CustomData customData = stack.get(customDataType);
         if (customData != null && customData.isEmpty()) {
-            stack.remove(DataComponents.CUSTOM_DATA);
+            stack.remove(customDataType);
             return true;
         }
 
@@ -55,7 +61,8 @@ public class ItemDataSanitizer {
      */
     private static boolean isBlacklisted(ItemStack stack) {
         try {
-            ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+            Item item = Objects.requireNonNull(stack.getItem(), "Item cannot be null");
+            ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
             String itemIdStr = itemId.toString();
 
             return GameplayConfig.ITEM_NBT_SANITIZER_BLACKLIST.get().contains(itemIdStr);

@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import java.util.Objects;
+
 /**
  * Mixin to prevent silent lightning from playing sound.
  * <p>
@@ -44,9 +46,13 @@ public class SilentLightningFixMixin {
     private void redirectPlaySound(Level level, double x, double y, double z,
             SoundEvent sound, SoundSource source,
             float volume, float pitch, boolean distanceDelay) {
+        // Ensure non-null values
+        SoundEvent validSound = Objects.requireNonNull(sound, "Sound cannot be null");
+        SoundSource validSource = Objects.requireNonNull(source, "Source cannot be null");
+
         // If feature is disabled, play sound normally
         if (!SafetyConfig.ENABLE_SILENT_LIGHTNING_FIX.get()) {
-            level.playLocalSound(x, y, z, sound, source, volume, pitch, distanceDelay);
+            level.playLocalSound(x, y, z, validSound, validSource, volume, pitch, distanceDelay);
             return;
         }
 
@@ -55,7 +61,7 @@ public class SilentLightningFixMixin {
 
         // Only play sound if the lightning is not silent
         if (!lightning.isSilent()) {
-            level.playLocalSound(x, y, z, sound, source, volume, pitch, distanceDelay);
+            level.playLocalSound(x, y, z, validSound, validSource, volume, pitch, distanceDelay);
         }
     }
 }

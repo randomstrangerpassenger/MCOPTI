@@ -1,7 +1,7 @@
 package com.randomstrangerpassenger.mcopt.safety;
 
 import com.randomstrangerpassenger.mcopt.MCOPT;
-
+import com.randomstrangerpassenger.mcopt.client.rendering.RenderFrameCache;
 import com.randomstrangerpassenger.mcopt.util.FeatureToggles;
 import com.randomstrangerpassenger.mcopt.util.FeatureKey;
 import net.minecraft.client.Minecraft;
@@ -12,6 +12,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.ref.WeakReference;
 
@@ -30,6 +32,8 @@ import java.lang.ref.WeakReference;
  */
 @EventBusSubscriber(modid = MCOPT.MOD_ID, value = Dist.CLIENT)
 public class LeakGuard {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LeakGuard.class);
 
     private static WeakReference<ClientLevel> lastUnloadedLevel = new WeakReference<>(null);
     private static int ticksSinceUnload = 0;
@@ -77,7 +81,7 @@ public class LeakGuard {
         } else {
             // Reset tracking if level has been collected
             if (ticksSinceUnload > 0) {
-                MCOPT.LOGGER.debug("Unloaded level successfully collected by GC after {} ticks", ticksSinceUnload);
+                LOGGER.debug("Unloaded level successfully collected by GC after {} ticks", ticksSinceUnload);
                 ticksSinceUnload = 0;
                 gcAttempted = false;
             }
@@ -88,7 +92,6 @@ public class LeakGuard {
             long now = System.currentTimeMillis();
             if (now - lastMemorySample > 300000) { // 5 minutes
                 lastMemorySample = now;
-                // Optional: Perform lightweight cleanup if memory usage is high
                 checkMemoryUsage();
             }
         }
@@ -98,7 +101,7 @@ public class LeakGuard {
         lastUnloadedLevel = new WeakReference<>(level);
         ticksSinceUnload = 0;
         gcAttempted = false;
-        MCOPT.LOGGER.debug("LeakGuard watching level unload: {}", level);
+        LOGGER.debug("LeakGuard watching level unload: {}", level);
 
         // Proactively clear MCOPT caches
         clearModCaches();
@@ -106,14 +109,14 @@ public class LeakGuard {
 
     private static void clearModCaches() {
         // Clear RenderFrameCache
-        // RenderFrameCache.reset(); // Method needs to be added to RenderFrameCache
+        RenderFrameCache.reset();
 
         // Clear other static caches if necessary
-        MCOPT.LOGGER.debug("LeakGuard cleared mod caches");
+        LOGGER.debug("LeakGuard cleared mod caches");
     }
 
     private static void attemptLeakRecovery() {
-        MCOPT.LOGGER.warn("Potential level leak detected! Level still in memory 10s after unload.");
+        LOGGER.warn("Potential level leak detected! Level still in memory 10s after unload.");
         gcAttempted = true;
 
         // Suggest GC to JVM (no guarantee, but often helps with weak references)
@@ -129,7 +132,7 @@ public class LeakGuard {
         if (usagePercent > 0.90) {
             long now = System.currentTimeMillis();
             if (now - lastMemoryAlert > 60000) { // Don't spam alerts
-                MCOPT.LOGGER.warn("High memory usage detected ({}%). Triggering emergency cleanup.",
+                LOGGER.warn("High memory usage detected ({}%). Triggering emergency cleanup.",
                         (int) (usagePercent * 100));
                 lastMemoryAlert = now;
                 // Trigger cleanup

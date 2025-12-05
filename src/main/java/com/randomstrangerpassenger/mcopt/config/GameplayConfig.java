@@ -218,7 +218,9 @@ public class GameplayConfig {
                                                 "일부 아이템은 빈 태그가 식별자로 필요할 수 있습니다",
                                                 "예: minecraft:player_head",
                                                 "List of item IDs to exclude from empty NBT tag sanitization")
-                                .define("itemBlacklist", java.util.List.of(),
+                                .define("itemBlacklist",
+                                                java.util.Objects.requireNonNull(java.util.List.of(),
+                                                                "Default list cannot be null"),
                                                 obj -> obj instanceof String);
 
                 BUILDER.pop();

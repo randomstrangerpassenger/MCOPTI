@@ -27,12 +27,21 @@ public abstract class ParticleEngineMixin {
 
     @Inject(method = "add", at = @At("HEAD"), cancellable = true)
     private void mcopt$cullParticle(Particle particle, CallbackInfo ci) {
-        if (particle == null || this.minecraft == null || this.minecraft.level == null) {
+        if (particle == null || this.minecraft == null) {
+            return;
+        }
+
+        // Check that level is not null before accessing it
+        if (this.minecraft.level == null) {
             return;
         }
 
         Vec3 camera = this.minecraft.gameRenderer.getMainCamera().getPosition();
-        long tick = this.minecraft.level.getGameTime();
+        net.minecraft.client.multiplayer.ClientLevel level = this.minecraft.level;
+        if (level == null) {
+            return;
+        }
+        long tick = level.getGameTime();
 
         if (ParticleOptimizationHandler.shouldCullParticle(particle, camera, tick)) {
             ci.cancel();

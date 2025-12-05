@@ -127,7 +127,8 @@ public class StrategyRegistry {
 
         // Iterate through strategies to find applicable ones
         for (OptimizationStrategy strategy : strategies) {
-            TagKey<EntityType<?>> targetTag = strategy.getTargetTag();
+            TagKey<EntityType<?>> targetTag = java.util.Objects.requireNonNull(
+                    strategy.getTargetTag(), "Target tag cannot be null");
 
             // Check if mob type has this tag
             if (type.is(targetTag)) {

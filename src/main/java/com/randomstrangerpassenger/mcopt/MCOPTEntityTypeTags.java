@@ -1,9 +1,12 @@
 package com.randomstrangerpassenger.mcopt;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
+
+import java.util.Objects;
 
 /**
  * Custom entity type tags for MCOPT mod.
@@ -41,6 +44,13 @@ public class MCOPTEntityTypeTags {
      * Helper method to create a tag key.
      */
     private static TagKey<EntityType<?>> tag(String name) {
-        return TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath("mcopt", name));
+        String validName = Objects.requireNonNull(name, "Tag name cannot be null");
+        ResourceLocation location = Objects.requireNonNull(
+                ResourceLocation.fromNamespaceAndPath("mcopt", validName),
+                "ResourceLocation cannot be null");
+        @SuppressWarnings("unchecked")
+        ResourceKey<net.minecraft.core.Registry<EntityType<?>>> registryKey = (ResourceKey<net.minecraft.core.Registry<EntityType<?>>>) (Object) Objects
+                .requireNonNull(Registries.ENTITY_TYPE, "Registries.ENTITY_TYPE cannot be null");
+        return TagKey.create(registryKey, location);
     }
 }

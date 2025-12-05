@@ -6,6 +6,7 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Handles experience orb merging logic.
@@ -44,7 +45,8 @@ public final class XpOrbHandler {
         }
 
         // Create bounding box for searching nearby orbs using cached radius
-        AABB searchBox = targetOrb.getBoundingBox().inflate(cachedMergeRadius);
+        AABB searchBox = Objects.requireNonNull(
+                targetOrb.getBoundingBox().inflate(cachedMergeRadius), "Search box cannot be null");
 
         // Find nearby experience orbs
         List<ExperienceOrb> nearbyOrbs = targetOrb.level().getEntitiesOfClass(

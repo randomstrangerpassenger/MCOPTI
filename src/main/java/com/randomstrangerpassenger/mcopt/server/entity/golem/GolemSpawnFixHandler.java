@@ -5,9 +5,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
+
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -77,20 +80,27 @@ public final class GolemSpawnFixHandler {
     }
 
     private boolean isSpawnableSurface(LevelAccessor level, BlockPos pos, IronGolem golem) {
-        if (!level.isEmptyBlock(pos) || !level.isEmptyBlock(pos.above())) {
+        BlockPos validPos = Objects.requireNonNull(pos, "Position cannot be null");
+        BlockPos abovePos = Objects.requireNonNull(validPos.above(), "Above position cannot be null");
+
+        if (!level.isEmptyBlock(validPos) || !level.isEmptyBlock(abovePos)) {
             return false; // Need two blocks of air for the golem's head
         }
 
-        BlockPos floorPos = pos.below();
+        BlockPos floorPos = Objects.requireNonNull(validPos.below(), "Floor position cannot be null");
         BlockState floor = level.getBlockState(floorPos);
 
         // isSolid() is deprecated, use isCollisionShapeFullBlock for "solid ground"
         // For spawning, we generally want a solid top face.
-        if (!floor.isCollisionShapeFullBlock(level, floorPos)) {
+        BlockPos validFloorPos = Objects.requireNonNull(floorPos, "Valid floor position cannot be null");
+        if (!floor.isCollisionShapeFullBlock(level, validFloorPos)) {
             return false;
         }
 
         // Ensure the golem can stand here with vanilla collision checks
-        return level.noCollision(golem.getType().getDimensions().makeBoundingBox(Vec3.atBottomCenterOf(pos)));
+        Vec3 bottomCenter = Objects.requireNonNull(Vec3.atBottomCenterOf(validPos), "Vec3 cannot be null");
+        AABB boundingBox = Objects.requireNonNull(
+                golem.getType().getDimensions().makeBoundingBox(bottomCenter), "BoundingBox cannot be null");
+        return level.noCollision(boundingBox);
     }
 }

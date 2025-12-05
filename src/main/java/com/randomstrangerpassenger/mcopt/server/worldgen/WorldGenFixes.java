@@ -6,22 +6,28 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 
+import java.util.Objects;
+
 /**
  * Handler for world generation fixes, particularly for lake feature generation.
  * <p>
- * Prevents crashes caused by lake generation attempting to check biomes in unloaded chunks.
+ * Prevents crashes caused by lake generation attempting to check biomes in
+ * unloaded chunks.
  */
 public class WorldGenFixes {
 
     /**
      * Safely checks if a biome at a given position should freeze water.
      * <p>
-     * This method ensures that the chunk at the position is loaded before attempting
-     * to retrieve biome information, preventing crashes during custom terrain generation.
+     * This method ensures that the chunk at the position is loaded before
+     * attempting
+     * to retrieve biome information, preventing crashes during custom terrain
+     * generation.
      *
      * @param level The world generation level
      * @param pos   The block position to check
-     * @return true if the biome should freeze water, false if chunk is unloaded or biome doesn't freeze
+     * @return true if the biome should freeze water, false if chunk is unloaded or
+     *         biome doesn't freeze
      */
     public static boolean shouldBiomeFreezeWaterSafely(WorldGenLevel level, BlockPos pos) {
         try {
@@ -30,7 +36,8 @@ public class WorldGenFixes {
             int chunkZ = pos.getZ() >> 4;
 
             // Attempt to get the chunk without forcing generation
-            ChunkAccess chunk = level.getChunk(chunkX, chunkZ, ChunkStatus.EMPTY, false);
+            ChunkStatus emptyStatus = Objects.requireNonNull(ChunkStatus.EMPTY, "ChunkStatus.EMPTY cannot be null");
+            ChunkAccess chunk = level.getChunk(chunkX, chunkZ, emptyStatus, false);
 
             if (chunk == null) {
                 // Chunk is not loaded, return false (don't freeze)
@@ -51,11 +58,13 @@ public class WorldGenFixes {
     /**
      * Safely checks if a biome at a given position should snow.
      * <p>
-     * Similar to {@link #shouldBiomeFreezeWaterSafely}, but checks for snow precipitation.
+     * Similar to {@link #shouldBiomeFreezeWaterSafely}, but checks for snow
+     * precipitation.
      *
      * @param level The world generation level
      * @param pos   The block position to check
-     * @return true if the biome should have snow, false if chunk is unloaded or biome doesn't snow
+     * @return true if the biome should have snow, false if chunk is unloaded or
+     *         biome doesn't snow
      */
     public static boolean shouldBiomeSnowSafely(WorldGenLevel level, BlockPos pos) {
         try {
@@ -64,7 +73,8 @@ public class WorldGenFixes {
             int chunkZ = pos.getZ() >> 4;
 
             // Attempt to get the chunk without forcing generation
-            ChunkAccess chunk = level.getChunk(chunkX, chunkZ, ChunkStatus.EMPTY, false);
+            ChunkStatus emptyStatus = Objects.requireNonNull(ChunkStatus.EMPTY, "ChunkStatus.EMPTY cannot be null");
+            ChunkAccess chunk = level.getChunk(chunkX, chunkZ, emptyStatus, false);
 
             if (chunk == null) {
                 // Chunk is not loaded, return false (no snow)

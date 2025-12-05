@@ -1,223 +1,149 @@
 package com.randomstrangerpassenger.mcopt.client.fps;
 
 import com.randomstrangerpassenger.mcopt.MCOPT;
-import com.randomstrangerpassenger.mcopt.config.PerformanceConfig;
 import com.randomstrangerpassenger.mcopt.util.FeatureToggles;
 import com.randomstrangerpassenger.mcopt.util.FeatureKey;
-import com.randomstrangerpassenger.mcopt.util.MCOPTConstants;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
-import net.minecraft.client.gui.screens.Screen;
-import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+
+import java.util.Objects;
 
 /**
  * Lightweight controller that dynamically adjusts the client framerate limit
  * based on window focus.
  * <p>
  * The goal is to mimic the usability of Dynamic FPS while keeping a fully
- * independent implementation
- * that favors compatibility: no custom game loop hooks, no alterations to
- * simulation state, and only
- * simple framerate cap adjustments on the render thread.
+ * independent implementation that favors compatibility: no custom game loop
+ * hooks,
+ * no alterations to simulation state, and only simple framerate cap adjustments
+ * on the render thread.
+ * </p>
+ * <p>
+ * This class has been refactored to use separate components for different
+ * responsibilities, improving maintainability and testability.
+ * </p>
  */
 public final class DynamicFpsManager {
 
-    private static final int MIN_RENDER_DISTANCE = 4;
-    private static final int RENDER_DISTANCE_REDUCTION = 4;
-
     private final Minecraft minecraft;
+    private final InputEventAdapter inputAdapter;
+    private final StateDetector stateDetector;
+    private final FpsLimitResolver fpsResolver;
+    private final RenderDistanceAdjuster renderAdjuster;
+
     private DynamicFpsState activeState;
     private int userDefinedFramerate;
     private int appliedFramerate;
-    private long lastInteractionMillis;
-    private int previousRenderDistance;
-    private boolean renderDistanceReduced;
 
     public DynamicFpsManager() {
-        this.minecraft = Minecraft.getInstance();
+        this.minecraft = Objects.requireNonNull(Minecraft.getInstance(), "Minecraft instance cannot be null");
+        this.inputAdapter = new InputEventAdapter();
+        InputEventAdapter validInputAdapter = Objects.requireNonNull(inputAdapter, "InputEventAdapter cannot be null");
+        Minecraft validMinecraft = Objects.requireNonNull(minecraft, "Minecraft cannot be null");
+        this.stateDetector = new StateDetector(validMinecraft, validInputAdapter);
+        this.fpsResolver = new FpsLimitResolver();
+        this.renderAdjuster = new RenderDistanceAdjuster();
+
         this.userDefinedFramerate = readUserFramerateLimit();
         this.appliedFramerate = this.userDefinedFramerate;
         this.activeState = DynamicFpsState.IN_GAME;
-        this.lastInteractionMillis = Util.getMillis();
-        this.previousRenderDistance = -1;
-        this.renderDistanceReduced = false;
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onKeyInput(InputEvent.Key event) {
-        if (event.getAction() != MCOPTConstants.Input.INPUT_ACTION_RELEASE) {
-            markInteraction();
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseButton(InputEvent.MouseButton.Pre event) {
-        if (event.getAction() != MCOPTConstants.Input.INPUT_ACTION_RELEASE) {
-            markInteraction();
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseScroll(InputEvent.MouseScrollingEvent event) {
-        if (event.getScrollDeltaY() != 0.0) {
-            markInteraction();
-        }
+    /**
+     * Get the input event adapter for event registration.
+     * The adapter needs to be registered with the event bus externally.
+     *
+     * @return the input event adapter
+     */
+    public InputEventAdapter getInputAdapter() {
+        return inputAdapter;
     }
 
     @SubscribeEvent
     public void onClientTick(ClientTickEvent.Post event) {
-
         if (minecraft.getWindow() == null) {
             return;
         }
 
-        // Always keep the user setting in sync when the window is focused and no menu
-        // is open.
-        if (isForegroundGameplay()) {
+        // Always keep the user setting in sync when in foreground gameplay
+        if (stateDetector.isForegroundGameplay()) {
             userDefinedFramerate = readUserFramerateLimit();
         }
 
+        // If feature is disabled, restore user limit if needed
         if (!FeatureToggles.isEnabled(FeatureKey.DYNAMIC_FPS)) {
             restoreUserLimitIfNeeded();
             return;
         }
 
-        DynamicFpsState detectedState = detectState();
-        int targetLimit = resolveTargetLimit(detectedState);
+        // Detect current state and resolve target FPS limit
+        DynamicFpsState detectedState = Objects.requireNonNull(
+                stateDetector.detectState(), "Detected state cannot be null");
+        int targetLimit = fpsResolver.resolveTargetLimit(detectedState, userDefinedFramerate);
 
-        if (detectedState != activeState || targetLimit != appliedFramerate) {
+        // Apply changes if state or limit changed
+        DynamicFpsState currentActive = Objects.requireNonNull(activeState, "Active state cannot be null");
+        if (!detectedState.equals(currentActive) || targetLimit != appliedFramerate) {
             applyLimit(targetLimit, detectedState);
         }
     }
 
-    private DynamicFpsState detectState() {
-        if (minecraft.getWindow().isMinimized()) {
-            return DynamicFpsState.MINIMIZED;
-        }
-
-        if (!minecraft.isWindowActive()) {
-            return DynamicFpsState.UNFOCUSED;
-        }
-
-        Screen currentScreen = minecraft.screen;
-        if (currentScreen != null) {
-            return DynamicFpsState.MENU;
-        }
-
-        if (isIdleBoostActive()) {
-            return DynamicFpsState.IDLE;
-        }
-
-        return DynamicFpsState.IN_GAME;
-    }
-
-    private int resolveTargetLimit(DynamicFpsState state) {
-        if (!PerformanceConfig.ENABLE_BACKGROUND_THROTTLING.get()
-                && (state == DynamicFpsState.UNFOCUSED || state == DynamicFpsState.MINIMIZED)) {
-            return userDefinedFramerate;
-        }
-
-        return switch (state) {
-            case MINIMIZED -> PerformanceConfig.MINIMIZED_FRAME_RATE_LIMIT.get();
-            case UNFOCUSED -> PerformanceConfig.UNFOCUSED_FRAME_RATE_LIMIT.get();
-            case MENU -> PerformanceConfig.MENU_FRAME_RATE_LIMIT.get();
-            case IDLE -> PerformanceConfig.IDLE_FRAME_RATE_LIMIT.get();
-            case IN_GAME -> userDefinedFramerate;
-        };
-    }
-
+    /**
+     * Apply the FPS limit and handle state-specific adjustments.
+     *
+     * @param targetLimit   the FPS limit to apply
+     * @param detectedState the detected FPS state
+     */
     private void applyLimit(int targetLimit, DynamicFpsState detectedState) {
+        // Set the frame rate limit
         minecraft.options.framerateLimit().set(Math.max(0, targetLimit));
         appliedFramerate = targetLimit;
 
-        // Apply render distance reduction when entering idle state
-        if (detectedState == DynamicFpsState.IDLE && !renderDistanceReduced) {
-            applyRenderDistanceReduction();
-        } else if (detectedState != DynamicFpsState.IDLE && renderDistanceReduced) {
-            restoreRenderDistance();
+        // Apply or restore render distance based on state
+        Options options = Objects.requireNonNull(minecraft.options, "Options cannot be null");
+        if (detectedState == DynamicFpsState.IDLE && !renderAdjuster.isRenderDistanceReduced()) {
+            renderAdjuster.applyRenderDistanceReduction(options);
+        } else if (detectedState != DynamicFpsState.IDLE && renderAdjuster.isRenderDistanceReduced()) {
+            renderAdjuster.restoreRenderDistance(options);
         }
 
         activeState = detectedState;
         MCOPT.LOGGER.debug("Dynamic FPS state: {} (FPS cap set to {})", detectedState, targetLimit);
     }
 
-    private void applyRenderDistanceReduction() {
-        Options options = minecraft.options;
-        if (options != null) {
-            previousRenderDistance = options.renderDistance().get();
-            int newRenderDistance = Math.max(MIN_RENDER_DISTANCE, previousRenderDistance - RENDER_DISTANCE_REDUCTION);
-            options.renderDistance().set(newRenderDistance);
-            renderDistanceReduced = true;
-            MCOPT.LOGGER.debug("[DynamicFPS] Idle state: reduced render distance {} -> {}", previousRenderDistance,
-                    newRenderDistance);
-        }
-    }
-
-    private void restoreRenderDistance() {
-        if (previousRenderDistance > 0) {
-            Options options = minecraft.options;
-            if (options != null) {
-                options.renderDistance().set(previousRenderDistance);
-                renderDistanceReduced = false;
-                MCOPT.LOGGER.debug("[DynamicFPS] Restored render distance to {}", previousRenderDistance);
-            }
-        }
-    }
-
+    /**
+     * Restore the user's framerate limit if it differs from the applied limit.
+     */
     private void restoreUserLimitIfNeeded() {
         if (appliedFramerate != userDefinedFramerate) {
             applyLimit(userDefinedFramerate, DynamicFpsState.IN_GAME);
         }
     }
 
+    /**
+     * Read the user's framerate limit from Minecraft options.
+     * <p>
+     * Includes error handling for cases where options might not be available.
+     * </p>
+     *
+     * @return the user's framerate limit, or 0 if unavailable
+     */
     private int readUserFramerateLimit() {
         Options options = minecraft.options;
-        if (options != null) {
-            try {
-                OptionInstance<Integer> framerateLimit = options.framerateLimit();
-                return framerateLimit.get();
-            } catch (Exception e) {
-                MCOPT.LOGGER.debug("Failed to read options framerate limit, falling back to window state", e);
-            }
-        }
-        return Math.max(0, minecraft.options.framerateLimit().get());
-    }
-
-    private boolean isIdleBoostActive() {
-        if (!PerformanceConfig.ENABLE_IDLE_BOOST.get()) {
-            return false;
+        if (options == null) {
+            return 0;
         }
 
-        if (!minecraft.isWindowActive() || minecraft.getWindow().isMinimized()) {
-            return false;
+        try {
+            OptionInstance<Integer> framerateLimit = options.framerateLimit();
+            Integer value = framerateLimit.get();
+            return value != null ? Math.max(0, value) : 0;
+        } catch (Exception e) {
+            MCOPT.LOGGER.warn("Failed to read framerate limit from options, defaulting to 0", e);
+            return 0;
         }
-
-        if (minecraft.screen != null) {
-            return false;
-        }
-
-        long idleDurationMillis = Util.getMillis() - lastInteractionMillis;
-        long idleThresholdMillis = PerformanceConfig.IDLE_BOOST_INACTIVITY_SECONDS.get()
-                * MCOPTConstants.Performance.MILLIS_PER_SECOND;
-        return idleDurationMillis >= idleThresholdMillis;
-    }
-
-    private void markInteraction() {
-        lastInteractionMillis = Util.getMillis();
-
-        if (activeState == DynamicFpsState.IDLE) {
-            DynamicFpsState detectedState = detectState();
-            int targetLimit = resolveTargetLimit(detectedState);
-            applyLimit(targetLimit, detectedState);
-        }
-    }
-
-    private boolean isForegroundGameplay() {
-        return minecraft.isWindowActive() && !minecraft.getWindow().isMinimized() && minecraft.screen == null;
     }
 }

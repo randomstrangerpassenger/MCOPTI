@@ -1,6 +1,6 @@
 package com.randomstrangerpassenger.mcopt.benchmark;
 
-import com.randomstrangerpassenger.mcopt.ai.MathCache;
+import com.randomstrangerpassenger.mcopt.server.ai.MathCache;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
@@ -16,21 +16,19 @@ import java.util.concurrent.TimeUnit;
  * 3. Different usage scenarios (AI entity calculations)
  *
  * To run this benchmark:
- * ./gradlew jmh
+ * ./gradlew jmh -PenableJmh
  *
  * Expected results on Java 21+ with modern CPUs:
- * - atan2: MathCache may be 1.5-3x faster
- * - sin/cos: Native Math may be comparable or faster due to hardware acceleration
+ * - atan2: MathCache should be ≥10% faster to justify 1KB overhead
  *
  * Interpretation:
- * - If MathCache.atan2 is > 50% faster: Keep atan2 caching
- * - If MathCache.sin/cos is < 20% faster: Consider removing sin/cos caching
- * - Consider L1/L2 cache miss rates and memory footprint (16KB+)
+ * - If MathCache.atan2 is ≥10% faster: Keep atan2 caching
+ * - If <10% faster: Remove MathCache and use Math.atan2()
  */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-@Fork(value = 2, jvmArgs = {"-Xms2G", "-Xmx2G"})
+@Fork(value = 2, jvmArgs = { "-Xms2G", "-Xmx2G" })
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 public class MathCacheBenchmark {
@@ -75,42 +73,6 @@ public class MathCacheBenchmark {
     public void optimizedAtan2_MathCache(Blackhole bh) {
         for (int i = 0; i < DATA_SIZE; i++) {
             float result = MathCache.atan2(yValues[i], xValues[i]);
-            bh.consume(result);
-        }
-    }
-
-    // ========== sin/cos Benchmarks ==========
-
-    @Benchmark
-    public void baselineSin_JavaMath(Blackhole bh) {
-        for (int i = 0; i < DATA_SIZE; i++) {
-            double radians = Math.toRadians(angles[i]);
-            double result = Math.sin(radians);
-            bh.consume(result);
-        }
-    }
-
-    @Benchmark
-    public void optimizedSin_MathCache(Blackhole bh) {
-        for (int i = 0; i < DATA_SIZE; i++) {
-            float result = MathCache.sin((float) angles[i]);
-            bh.consume(result);
-        }
-    }
-
-    @Benchmark
-    public void baselineCos_JavaMath(Blackhole bh) {
-        for (int i = 0; i < DATA_SIZE; i++) {
-            double radians = Math.toRadians(angles[i]);
-            double result = Math.cos(radians);
-            bh.consume(result);
-        }
-    }
-
-    @Benchmark
-    public void optimizedCos_MathCache(Blackhole bh) {
-        for (int i = 0; i < DATA_SIZE; i++) {
-            float result = MathCache.cos((float) angles[i]);
             bh.consume(result);
         }
     }

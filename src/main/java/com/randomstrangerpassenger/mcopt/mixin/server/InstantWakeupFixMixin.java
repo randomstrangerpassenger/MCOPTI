@@ -3,12 +3,14 @@ package com.randomstrangerpassenger.mcopt.mixin.server;
 import com.randomstrangerpassenger.mcopt.config.SafetyConfig;
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.GameRules;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -60,12 +62,15 @@ public abstract class InstantWakeupFixMixin {
             long gameTime = ((ServerLevel) (Object) this).getGameTime();
             long dayTime = this.getDayTime();
 
+            // Ensure RULE_DAYLIGHT key is not null
+            GameRules.Key<GameRules.BooleanValue> daylightRule = Objects.requireNonNull(
+                    GameRules.RULE_DAYLIGHT, "RULE_DAYLIGHT cannot be null");
+
             // Create and broadcast the time packet to all players
             ClientboundSetTimePacket packet = new ClientboundSetTimePacket(
                     gameTime,
                     dayTime,
-                    ((ServerLevel) (Object) this).getGameRules()
-                            .getBoolean(net.minecraft.world.level.GameRules.RULE_DAYLIGHT));
+                    ((ServerLevel) (Object) this).getGameRules().getBoolean(daylightRule));
             ((ServerLevel) (Object) this).getServer().getPlayerList().broadcastAll(packet);
 
         } catch (Exception e) {

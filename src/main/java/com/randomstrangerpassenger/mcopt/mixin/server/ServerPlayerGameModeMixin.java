@@ -1,6 +1,7 @@
 package com.randomstrangerpassenger.mcopt.mixin.server;
 
 import com.randomstrangerpassenger.mcopt.config.GameplayConfig;
+import com.randomstrangerpassenger.mcopt.util.InteractionFallthroughHandler;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.world.InteractionHand;
@@ -13,6 +14,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Objects;
 
 /**
  * Mixin for server-side interaction fallthrough behavior (RCF-style).
@@ -37,9 +40,6 @@ public abstract class ServerPlayerGameModeMixin {
 
     /**
      * Intercepts useItemOn to implement fallthrough behavior on the server.
-     * <p>
-     * When the main hand interaction fails but the off-hand has an item,
-     * this method triggers the off-hand usage automatically.
      */
     @Inject(method = "useItemOn", at = @At("RETURN"), cancellable = true)
     private void mcopt$onUseItemOnReturn(ServerPlayer serverPlayer, Level world, ItemStack stack,
@@ -48,40 +48,31 @@ public abstract class ServerPlayerGameModeMixin {
             return;
         }
 
-        // Only process main hand failures
-        if (hand != InteractionHand.MAIN_HAND) {
-            return;
-        }
-
         InteractionResult result = cir.getReturnValue();
 
-        // Only fallthrough on FAIL result
-        if (result != InteractionResult.FAIL) {
+        // Check if fallthrough should occur
+        if (!InteractionFallthroughHandler.shouldFallthrough(hand, result, serverPlayer)) {
             return;
         }
 
-        // Check if off-hand has an item
-        ItemStack offHandItem = serverPlayer.getOffhandItem();
-        if (offHandItem.isEmpty()) {
-            return;
-        }
+        // Ensure non-null values for API call
+        Level validWorld = Objects.requireNonNull(world, "World cannot be null");
+        ItemStack offHandItem = Objects.requireNonNull(serverPlayer.getOffhandItem(), "Off-hand item cannot be null");
+        BlockHitResult validHitResult = Objects.requireNonNull(hitResult, "Hit result cannot be null");
 
         // Try using off-hand on the block
         ServerPlayerGameMode gameMode = (ServerPlayerGameMode) (Object) this;
-        InteractionResult offHandResult = gameMode.useItemOn(serverPlayer, world, offHandItem,
-                InteractionHand.OFF_HAND, hitResult);
+        InteractionResult offHandResult = gameMode.useItemOn(serverPlayer, validWorld, offHandItem,
+                InteractionHand.OFF_HAND, validHitResult);
 
         // If off-hand succeeded, return its result
-        if (offHandResult.consumesAction()) {
+        if (InteractionFallthroughHandler.shouldUseOffHandResult(offHandResult)) {
             cir.setReturnValue(offHandResult);
         }
     }
 
     /**
-     * Intercepts useItem (use in air) to implement fallthrough behavior on the server.
-     * <p>
-     * When the main hand interaction fails but the off-hand has an item,
-     * this method triggers the off-hand usage automatically.
+     * Intercepts useItem (use in air) to implement server-side fallthrough.
      */
     @Inject(method = "useItem", at = @At("RETURN"), cancellable = true)
     private void mcopt$onUseItemReturn(ServerPlayer serverPlayer, Level world, ItemStack stack,
@@ -90,30 +81,24 @@ public abstract class ServerPlayerGameModeMixin {
             return;
         }
 
-        // Only process main hand failures
-        if (hand != InteractionHand.MAIN_HAND) {
-            return;
-        }
-
         InteractionResult result = cir.getReturnValue();
 
-        // Only fallthrough on FAIL result
-        if (result != InteractionResult.FAIL) {
+        // Check if fallthrough should occur
+        if (!InteractionFallthroughHandler.shouldFallthrough(hand, result, serverPlayer)) {
             return;
         }
 
-        // Check if off-hand has an item
-        ItemStack offHandItem = serverPlayer.getOffhandItem();
-        if (offHandItem.isEmpty()) {
-            return;
-        }
+        // Ensure non-null values for API call
+        Level validWorld = Objects.requireNonNull(world, "World cannot be null");
+        ItemStack offHandItem = Objects.requireNonNull(serverPlayer.getOffhandItem(), "Off-hand item cannot be null");
 
         // Try using off-hand in air
         ServerPlayerGameMode gameMode = (ServerPlayerGameMode) (Object) this;
-        InteractionResult offHandResult = gameMode.useItem(serverPlayer, world, offHandItem, InteractionHand.OFF_HAND);
+        InteractionResult offHandResult = gameMode.useItem(serverPlayer, validWorld, offHandItem,
+                InteractionHand.OFF_HAND);
 
         // If off-hand succeeded, return its result
-        if (offHandResult.consumesAction()) {
+        if (InteractionFallthroughHandler.shouldUseOffHandResult(offHandResult)) {
             cir.setReturnValue(offHandResult);
         }
     }

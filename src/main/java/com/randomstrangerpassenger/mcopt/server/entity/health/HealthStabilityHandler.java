@@ -4,7 +4,10 @@ import com.randomstrangerpassenger.mcopt.MCOPT;
 import com.randomstrangerpassenger.mcopt.config.SafetyConfig;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import net.minecraft.core.Holder;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -44,7 +47,9 @@ public class HealthStabilityHandler {
         Player player = event.getEntity();
         UUID uuid = player.getUUID();
 
-        double currentMax = player.getAttributeValue(Attributes.MAX_HEALTH);
+        Holder<Attribute> maxHealthAttribute = Objects.requireNonNull(
+                Attributes.MAX_HEALTH, "MAX_HEALTH attribute cannot be null");
+        double currentMax = player.getAttributeValue(maxHealthAttribute);
         double previousMax = LAST_MAX_HEALTH.getOrDefault(uuid, currentMax);
 
         // Avoid division by zero and noise from tiny attribute fluctuations
@@ -82,7 +87,9 @@ public class HealthStabilityHandler {
             LAST_MAX_HEALTH.remove(event.getOriginal().getUUID());
         } else {
             // For dimension changes, keep the ratio logic consistent
-            double originalMax = event.getOriginal().getAttributeValue(Attributes.MAX_HEALTH);
+            Holder<Attribute> maxHealthAttribute = Objects.requireNonNull(
+                    Attributes.MAX_HEALTH, "MAX_HEALTH attribute cannot be null");
+            double originalMax = event.getOriginal().getAttributeValue(maxHealthAttribute);
             LAST_MAX_HEALTH.put(event.getEntity().getUUID(), originalMax);
         }
     }

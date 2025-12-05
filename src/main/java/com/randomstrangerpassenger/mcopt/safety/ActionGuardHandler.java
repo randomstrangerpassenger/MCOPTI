@@ -27,10 +27,27 @@ import java.util.concurrent.ConcurrentHashMap;
  * villagers, or decoration entities. The implementation is intentionally
  * conservative to avoid interfering with other combat/interaction mods.
  */
-public class ActionGuardHandler {
+public class ActionGuardHandler implements SafetyModule {
 
     private static final long MESSAGE_COOLDOWN_TICKS = 40;
     private final Map<UUID, Long> lastWarningTick = new ConcurrentHashMap<>();
+
+    @Override
+    public String getModuleName() {
+        return "Action Guard";
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return FeatureToggles.isEnabled(FeatureKey.ACTION_GUARD);
+    }
+
+    @Override
+    public void initialize() {
+        // Event handler registration happens via NeoForge.EVENT_BUS.register()
+        // This is called by the registry after checking isEnabled()
+        MCOPT.LOGGER.debug("ActionGuardHandler initialized");
+    }
 
     @SubscribeEvent
     public void onAttackEntity(AttackEntityEvent event) {
@@ -91,7 +108,8 @@ public class ActionGuardHandler {
         long lastTick = lastWarningTick.getOrDefault(id, -MESSAGE_COOLDOWN_TICKS);
         if (gameTime - lastTick >= MESSAGE_COOLDOWN_TICKS) {
             lastWarningTick.put(id, gameTime);
-            player.displayClientMessage(message, true);
+            Component validMessage = java.util.Objects.requireNonNull(message, "Message cannot be null");
+            player.displayClientMessage(validMessage, true);
             MCOPT.LOGGER.debug("ActionGuard: {} prevented from damaging {}", player.getScoreboardName(),
                     event.getTarget().getName().getString());
         }
